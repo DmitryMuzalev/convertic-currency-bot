@@ -1,0 +1,32 @@
+{
+  "name": "convertic-currency-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot that returns currency exchange rates using the Frankfurter API",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "telegram-bot",
+    "currency",
+    "fastify",
+    "frankfurter"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^5.12.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.9.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6"
+  }
+}
