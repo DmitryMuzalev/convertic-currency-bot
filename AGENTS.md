@@ -16,6 +16,8 @@
 - `api` contains thin Vercel Function entry points. Do not place business logic there.
 - `src/main.js` is the entry point for local server startup.
 - Pass external dependencies into use cases instead of importing adapters from use cases.
+- Use the `#domain/*`, `#application/*`, `#adapters/*`, and `#infrastructure/*` aliases for imports between layers instead of parent-directory relative paths.
+- Keep relative imports for modules within the same directory or feature when they remain short and clear.
 
 ## Naming
 
