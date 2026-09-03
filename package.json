@@ -17,6 +17,9 @@
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env src/main.js",
     "start": "node --env-file-if-exists=.env src/main.js",
+    "tunnel": "npx --yes localtunnel --port 3000",
+    "telegram:set-webhook": "node --env-file-if-exists=.env scripts/manage-telegram-webhook.js set",
+    "telegram:delete-webhook": "node --env-file-if-exists=.env scripts/manage-telegram-webhook.js delete",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

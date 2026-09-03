@@ -1,5 +1,5 @@
 export function registerTelegramWebhookRoute(app, { handleCurrencyMessage }) {
-  app.post('/webhook', async request => {
+  app.post('/webhooks/telegram', async request => {
     const message = getTextMessage(request.body);
 
     if (!message) {
