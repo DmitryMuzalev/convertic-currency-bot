@@ -1,3 +1,7 @@
+import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
+
+const INVALID_CURRENCY_MESSAGE = 'Send a three-letter currency code, for example EUR.';
+
 export class HandleCurrencyMessage {
   constructor({ getExchangeRateAgainstUsd, messageSender } = {}) {
     if (!getExchangeRateAgainstUsd || typeof getExchangeRateAgainstUsd.execute !== 'function') {
@@ -13,13 +17,26 @@ export class HandleCurrencyMessage {
   }
 
   async execute({ chatId, currencyCode } = {}) {
-    const rate = await this.getExchangeRateAgainstUsd.execute(currencyCode);
+    let rate;
+
+    try {
+      rate = await this.getExchangeRateAgainstUsd.execute(currencyCode);
+    } catch (error) {
+      if (!(error instanceof InvalidCurrencyCodeError)) {
+        throw error;
+      }
+
+      await this.messageSender.sendMessage(chatId, INVALID_CURRENCY_MESSAGE);
+      return { handled: false };
+    }
+
     const normalizedCurrencyCode = currencyCode.trim().toUpperCase();
     const text = `1 ${normalizedCurrencyCode} = ${rate} USD`;
 
     await this.messageSender.sendMessage(chatId, text);
 
     return {
+      handled: true,
       currencyCode: normalizedCurrencyCode,
       rate,
     };
