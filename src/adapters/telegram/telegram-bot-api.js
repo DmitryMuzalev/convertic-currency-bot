@@ -1,9 +1,13 @@
+import { MessageSender } from '#application/ports/message-sender.js';
+
 import { TelegramApiError } from './telegram-api-error.js';
 
 const DEFAULT_BASE_URL = 'https://api.telegram.org';
 
-export class TelegramBotApi {
+export class TelegramBotApi extends MessageSender {
   constructor({ botToken, baseUrl = DEFAULT_BASE_URL, fetchFunction = globalThis.fetch } = {}) {
+    super();
+
     if (typeof botToken !== 'string' || botToken.trim() === '') {
       throw new TypeError('botToken must be a non-empty string');
     }
