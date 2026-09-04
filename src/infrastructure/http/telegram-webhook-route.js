@@ -9,6 +9,7 @@ export function registerTelegramWebhookRoute(app, { handleTelegramMessage }) {
     await handleTelegramMessage.execute({
       chatId: message.chat.id,
       text: message.text,
+      languageCode: message.from?.language_code,
     });
 
     return { ok: true };

@@ -1,8 +1,4 @@
-import {
-  HELP_MESSAGE,
-  START_MESSAGE,
-  UNKNOWN_COMMAND_MESSAGE,
-} from '#application/messages/convertic-messages.js';
+import { getMessages } from '#application/messages/get-messages.js';
 
 const COMMAND_PATTERN = /^\/([a-z]+)(?:@[a-z0-9_]+)?(?:\s|$)/i;
 
@@ -20,24 +16,25 @@ export class HandleTelegramMessage {
     this.messageSender = messageSender;
   }
 
-  async execute({ chatId, text } = {}) {
+  async execute({ chatId, text, languageCode } = {}) {
     const command = extractCommand(text);
+    const messages = getMessages(languageCode);
 
     if (command === null) {
-      return this.handleCurrencyMessage.execute({ chatId, text });
+      return this.handleCurrencyMessage.execute({ chatId, text, languageCode });
     }
 
     if (command === 'start') {
-      await this.messageSender.sendMessage(chatId, START_MESSAGE);
+      await this.messageSender.sendMessage(chatId, messages.start);
       return { handled: true, command };
     }
 
     if (command === 'help') {
-      await this.messageSender.sendMessage(chatId, HELP_MESSAGE);
+      await this.messageSender.sendMessage(chatId, messages.help);
       return { handled: true, command };
     }
 
-    await this.messageSender.sendMessage(chatId, UNKNOWN_COMMAND_MESSAGE);
+    await this.messageSender.sendMessage(chatId, messages.unknownCommand);
     return { handled: false, command };
   }
 }
