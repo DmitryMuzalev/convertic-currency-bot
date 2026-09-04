@@ -20,6 +20,8 @@ export const ENGLISH_MESSAGES = Object.freeze({
     '100 EUR — convert EUR to USD',
     '100 EUR GBP — convert EUR to GBP',
     'EUR USD GBP JPY — show several EUR rates',
+    'EUR USD 2025-01-15 — historical rate',
+    'EUR USD GBP JPY 2025-01-15 — several historical rates',
     'convert 100 EUR to GBP — conversational conversion',
     'show USD to GBP rate — conversational rate request',
     '',
@@ -33,18 +35,22 @@ export const ENGLISH_MESSAGES = Object.freeze({
   unknownCommand: '🎩 That spell is not in my book yet. Try /help to see what I can do.',
   invalidCurrencyRequest: [
     '🪄 I could not understand that currency spell.',
-    'Try EUR, EUR GBP, 100 EUR, 100 EUR GBP, or EUR USD GBP JPY.',
+    'Try EUR, EUR GBP, 100 EUR, EUR USD GBP JPY, or EUR USD 2025-01-15.',
     'You can also write: convert 100 EUR to GBP.',
   ].join('\n'),
   currencyPairNotFound:
     '🔮 I could not find that currency pair. Check the three-letter currency codes and try again.',
   exchangeRateUnavailable: '☁️ My crystal ball is cloudy right now. Please try again in a moment.',
   rateHeading: '🎩 Ta-da! Here is the exchange-rate reveal:',
+  historicalRateHeading: '🕰️ A rate from the archives:',
   conversionHeading: '✨ Conversion complete!',
   rateLabel: 'Rate',
   reverseLabel: 'Reverse',
   rateDateLabel: '📅 Rate date',
   multipleRatesHeading: '🎩 One currency, several reveals:',
+  historicalMultipleRatesHeading: '🕰️ Several rates from the archives:',
   currenciesHeading: '🎩 Currencies in my spell book',
   currenciesHint: 'Send any code to reveal its rate against USD.',
+  invalidExchangeRateDate:
+    '🕰️ That date is outside my spell book. Use YYYY-MM-DD and do not choose a future date.',
 });

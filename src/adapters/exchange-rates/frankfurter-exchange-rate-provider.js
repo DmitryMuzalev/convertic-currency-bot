@@ -16,13 +16,14 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
     this.fetchFunction = fetchFunction;
   }
 
-  async getRate({ baseCurrency, quoteCurrency }) {
-    const url = [
+  async getRate({ baseCurrency, quoteCurrency, date = null }) {
+    const path = [
       this.baseUrl,
       'rate',
       encodeURIComponent(baseCurrency),
       encodeURIComponent(quoteCurrency),
     ].join('/');
+    const url = date ? `${path}?date=${encodeURIComponent(date)}` : path;
 
     const payload = await this.fetchJson(url);
 
@@ -38,9 +39,10 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
     };
   }
 
-  async getRates({ baseCurrency, quoteCurrencies }) {
+  async getRates({ baseCurrency, quoteCurrencies, date = null }) {
     const quotes = quoteCurrencies.map(encodeURIComponent).join(',');
-    const url = `${this.baseUrl}/rates?base=${encodeURIComponent(baseCurrency)}&quotes=${quotes}`;
+    const dateQuery = date ? `&date=${encodeURIComponent(date)}` : '';
+    const url = `${this.baseUrl}/rates?base=${encodeURIComponent(baseCurrency)}&quotes=${quotes}${dateQuery}`;
     const payload = await this.fetchJson(url);
 
     if (!Array.isArray(payload) || payload.length !== quoteCurrencies.length) {

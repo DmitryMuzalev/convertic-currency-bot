@@ -1,4 +1,5 @@
 import { normalizeCurrencyCode } from '#domain/currency/normalize-currency-code.js';
+import { normalizeExchangeRateDate } from '#domain/exchange-rates/normalize-exchange-rate-date.js';
 import { InvalidCurrencyListError } from '#domain/errors/invalid-currency-list-error.js';
 
 import { MAX_QUOTE_CURRENCIES } from '#application/rules/currency-request-limits.js';
@@ -14,8 +15,9 @@ export class GetMultipleExchangeRates {
     this.exchangeRateProvider = exchangeRateProvider;
   }
 
-  async execute({ baseCurrency, quoteCurrencies } = {}) {
+  async execute({ baseCurrency, quoteCurrencies, date } = {}) {
     const normalizedBaseCurrency = normalizeCurrencyCode(baseCurrency);
+    const normalizedDate = date === undefined ? null : normalizeExchangeRateDate(date);
 
     if (!Array.isArray(quoteCurrencies)) {
       throw new InvalidCurrencyListError(quoteCurrencies);
@@ -36,6 +38,7 @@ export class GetMultipleExchangeRates {
     return this.exchangeRateProvider.getRates({
       baseCurrency: normalizedBaseCurrency,
       quoteCurrencies: normalizedQuoteCurrencies,
+      date: normalizedDate,
     });
   }
 }

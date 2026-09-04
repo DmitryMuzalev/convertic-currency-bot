@@ -20,6 +20,8 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     '100 EUR — конвертировать EUR в USD',
     '100 EUR GBP — конвертировать EUR в GBP',
     'EUR USD GBP JPY — показать несколько курсов EUR',
+    'EUR USD 2025-01-15 — исторический курс',
+    'EUR USD GBP JPY 2025-01-15 — несколько исторических курсов',
     'переведи 100 EUR в GBP — разговорная конвертация',
     'покажи курс USD к GBP — разговорный запрос курса',
     '',
@@ -33,7 +35,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   unknownCommand: '🎩 Такого заклинания в моей книге пока нет. Загляни в /help.',
   invalidCurrencyRequest: [
     '🪄 Мне не удалось разобрать это валютное заклинание.',
-    'Попробуй EUR, EUR GBP, 100 EUR, 100 EUR GBP или EUR USD GBP JPY.',
+    'Попробуй EUR, EUR GBP, 100 EUR, EUR USD GBP JPY или EUR USD 2025-01-15.',
     'Также можно написать: переведи 100 EUR в GBP.',
   ].join('\n'),
   currencyPairNotFound:
@@ -41,11 +43,15 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   exchangeRateUnavailable:
     '☁️ Мой хрустальный шар немного помутнел. Попробуй ещё раз через минуту.',
   rateHeading: '🎩 Та-дам! Раскрываю валютный курс:',
+  historicalRateHeading: '🕰️ Курс из валютных архивов:',
   conversionHeading: '✨ Превращение завершено!',
   rateLabel: 'Курс',
   reverseLabel: 'Обратный курс',
   rateDateLabel: '📅 Дата курса',
   multipleRatesHeading: '🎩 Одна валюта — несколько превращений:',
+  historicalMultipleRatesHeading: '🕰️ Несколько курсов из валютных архивов:',
   currenciesHeading: '🎩 Валют в моей книге заклинаний',
   currenciesHint: 'Отправь любой код, чтобы узнать его курс к USD.',
+  invalidExchangeRateDate:
+    '🕰️ Такой даты нет в моей книге заклинаний. Используй формат ГГГГ-ММ-ДД и не выбирай будущую дату.',
 });

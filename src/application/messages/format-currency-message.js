@@ -1,6 +1,26 @@
 export function createRateMessage({ baseCurrency, quoteCurrency, rate, date }, messages) {
-  const lines = [
+  return createRateMessageWithHeading(
+    { baseCurrency, quoteCurrency, rate, date },
+    messages,
     messages.rateHeading,
+  );
+}
+
+export function createHistoricalRateMessage({ baseCurrency, quoteCurrency, rate, date }, messages) {
+  return createRateMessageWithHeading(
+    { baseCurrency, quoteCurrency, rate, date },
+    messages,
+    messages.historicalRateHeading,
+  );
+}
+
+function createRateMessageWithHeading(
+  { baseCurrency, quoteCurrency, rate, date },
+  messages,
+  heading,
+) {
+  const lines = [
+    heading,
     '',
     `1 ${baseCurrency} = ${formatNumber(rate, messages.locale)} ${quoteCurrency}`,
     `1 ${quoteCurrency} = ${formatNumber(1 / rate, messages.locale)} ${baseCurrency}`,
@@ -42,6 +62,22 @@ export function createConversionMessage(
 }
 
 export function createMultipleRatesMessage({ baseCurrency, rates }, messages) {
+  return createMultipleRatesMessageWithHeading(
+    { baseCurrency, rates },
+    messages,
+    messages.multipleRatesHeading,
+  );
+}
+
+export function createHistoricalMultipleRatesMessage({ baseCurrency, rates }, messages) {
+  return createMultipleRatesMessageWithHeading(
+    { baseCurrency, rates },
+    messages,
+    messages.historicalMultipleRatesHeading,
+  );
+}
+
+function createMultipleRatesMessageWithHeading({ baseCurrency, rates }, messages, heading) {
   const dates = new Set(rates.map(rate => rate.date));
   const showDatePerRate = dates.size > 1;
   const rateLines = rates.map(rate => {
@@ -49,7 +85,7 @@ export function createMultipleRatesMessage({ baseCurrency, rates }, messages) {
 
     return `1 ${baseCurrency} = ${formatNumber(rate.rate, messages.locale)} ${rate.quoteCurrency}${rateDate}`;
   });
-  const lines = [messages.multipleRatesHeading, '', ...rateLines];
+  const lines = [heading, '', ...rateLines];
 
   if (dates.size === 1) {
     lines.push('', `${messages.rateDateLabel}: ${rates[0].date}`);

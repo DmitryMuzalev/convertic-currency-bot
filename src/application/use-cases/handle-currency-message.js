@@ -1,6 +1,8 @@
 import { ExchangeRateProviderError } from '#application/errors/exchange-rate-provider-error.js';
 import {
   createConversionMessage,
+  createHistoricalMultipleRatesMessage,
+  createHistoricalRateMessage,
   createMultipleRatesMessage,
   createRateMessage,
 } from '#application/messages/format-currency-message.js';
@@ -8,6 +10,7 @@ import { getMessages } from '#application/messages/get-messages.js';
 import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
 import { InvalidCurrencyAmountError } from '#domain/errors/invalid-currency-amount-error.js';
 import { InvalidCurrencyListError } from '#domain/errors/invalid-currency-list-error.js';
+import { InvalidExchangeRateDateError } from '#domain/errors/invalid-exchange-rate-date-error.js';
 
 export class HandleCurrencyMessage {
   constructor({
@@ -62,6 +65,11 @@ export class HandleCurrencyMessage {
 
       return { handled: true, request, result };
     } catch (error) {
+      if (error instanceof InvalidExchangeRateDateError) {
+        await this.messageSender.sendMessage(chatId, messages.invalidExchangeRateDate);
+        return { handled: false };
+      }
+
       if (
         error instanceof InvalidCurrencyCodeError ||
         error instanceof InvalidCurrencyAmountError ||
@@ -90,7 +98,7 @@ export class HandleCurrencyMessage {
       return this.convertCurrency.execute(request);
     }
 
-    if (request.type === 'multiple-rates') {
+    if (request.type === 'multiple-rates' || request.type === 'historical-multiple-rates') {
       return this.getMultipleExchangeRates.execute(request);
     }
 
@@ -104,6 +112,14 @@ export class HandleCurrencyMessage {
 
     if (request.type === 'multiple-rates') {
       return createMultipleRatesMessage(result, messages);
+    }
+
+    if (request.type === 'historical-rate') {
+      return createHistoricalRateMessage(result, messages);
+    }
+
+    if (request.type === 'historical-multiple-rates') {
+      return createHistoricalMultipleRatesMessage(result, messages);
     }
 
     return createRateMessage(result, messages);

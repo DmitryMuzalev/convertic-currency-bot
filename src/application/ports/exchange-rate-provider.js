@@ -10,6 +10,7 @@ export class ExchangeRateProvider {
    * @param {object} request
    * @param {string} request.baseCurrency ISO 4217 currency code, for example `EUR`.
    * @param {string} request.quoteCurrency ISO 4217 currency code, for example `USD`.
+   * @param {string|null} [request.date] Date in `YYYY-MM-DD` format, or `null` for latest.
    * @returns {Promise<{
    *   baseCurrency: string,
    *   quoteCurrency: string,
@@ -28,6 +29,7 @@ export class ExchangeRateProvider {
    * @param {object} request
    * @param {string} request.baseCurrency
    * @param {string[]} request.quoteCurrencies
+   * @param {string|null} [request.date] Date in `YYYY-MM-DD` format, or `null` for latest.
    * @returns {Promise<{
    *   baseCurrency: string,
    *   rates: Array<{quoteCurrency: string, rate: number, date: string}>
