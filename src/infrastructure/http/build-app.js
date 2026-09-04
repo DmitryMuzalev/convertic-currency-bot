@@ -2,14 +2,14 @@ import Fastify from 'fastify';
 
 import { registerTelegramWebhookRoute } from './telegram-webhook-route.js';
 
-export function buildApp({ handleCurrencyMessage, logger = false } = {}) {
-  if (!handleCurrencyMessage || typeof handleCurrencyMessage.execute !== 'function') {
-    throw new TypeError('handleCurrencyMessage must implement execute()');
+export function buildApp({ handleTelegramMessage, logger = false } = {}) {
+  if (!handleTelegramMessage || typeof handleTelegramMessage.execute !== 'function') {
+    throw new TypeError('handleTelegramMessage must implement execute()');
   }
 
   const app = Fastify({ logger });
 
-  registerTelegramWebhookRoute(app, { handleCurrencyMessage });
+  registerTelegramWebhookRoute(app, { handleTelegramMessage });
 
   return app;
 }

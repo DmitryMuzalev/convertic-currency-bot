@@ -1,4 +1,4 @@
-export function registerTelegramWebhookRoute(app, { handleCurrencyMessage }) {
+export function registerTelegramWebhookRoute(app, { handleTelegramMessage }) {
   app.post('/webhooks/telegram', async request => {
     const message = getTextMessage(request.body);
 
@@ -6,7 +6,7 @@ export function registerTelegramWebhookRoute(app, { handleCurrencyMessage }) {
       return { ok: true };
     }
 
-    await handleCurrencyMessage.execute({
+    await handleTelegramMessage.execute({
       chatId: message.chat.id,
       text: message.text,
     });
