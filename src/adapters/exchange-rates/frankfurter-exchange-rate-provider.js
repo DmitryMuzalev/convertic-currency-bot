@@ -15,7 +15,7 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
     this.fetchFunction = fetchFunction;
   }
 
-  async getRate(baseCurrency, quoteCurrency) {
+  async getRate({ baseCurrency, quoteCurrency }) {
     const url = [
       this.baseUrl,
       'rate',
@@ -54,11 +54,23 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       });
     }
 
-    if (typeof payload.rate !== 'number' || !Number.isFinite(payload.rate) || payload.rate <= 0) {
+    if (
+      payload.base !== baseCurrency ||
+      payload.quote !== quoteCurrency ||
+      typeof payload.date !== 'string' ||
+      typeof payload.rate !== 'number' ||
+      !Number.isFinite(payload.rate) ||
+      payload.rate <= 0
+    ) {
       throw new ExchangeRateProviderError('Exchange rate provider returned an invalid rate');
     }
 
-    return payload.rate;
+    return {
+      baseCurrency: payload.base,
+      quoteCurrency: payload.quote,
+      rate: payload.rate,
+      date: payload.date,
+    };
   }
 }
 
