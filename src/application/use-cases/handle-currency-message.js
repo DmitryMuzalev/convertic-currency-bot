@@ -7,10 +7,12 @@ import { getMessages } from '#application/messages/get-messages.js';
 import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
 import { InvalidCurrencyAmountError } from '#domain/errors/invalid-currency-amount-error.js';
 
-import { parseCurrencyRequest } from './parse-currency-request.js';
-
 export class HandleCurrencyMessage {
-  constructor({ getExchangeRate, convertCurrency, messageSender } = {}) {
+  constructor({ recognizeCurrencyRequest, getExchangeRate, convertCurrency, messageSender } = {}) {
+    if (!recognizeCurrencyRequest || typeof recognizeCurrencyRequest.execute !== 'function') {
+      throw new TypeError('recognizeCurrencyRequest must implement execute()');
+    }
+
     if (!getExchangeRate || typeof getExchangeRate.execute !== 'function') {
       throw new TypeError('getExchangeRate must implement execute()');
     }
@@ -23,21 +25,23 @@ export class HandleCurrencyMessage {
       throw new TypeError('messageSender must implement sendMessage()');
     }
 
+    this.recognizeCurrencyRequest = recognizeCurrencyRequest;
     this.getExchangeRate = getExchangeRate;
     this.convertCurrency = convertCurrency;
     this.messageSender = messageSender;
   }
 
   async execute({ chatId, text, languageCode } = {}) {
-    const request = parseCurrencyRequest(text);
     const messages = getMessages(languageCode);
 
-    if (!request) {
-      await this.messageSender.sendMessage(chatId, messages.invalidCurrencyRequest);
-      return { handled: false };
-    }
-
     try {
+      const request = await this.recognizeCurrencyRequest.execute(text);
+
+      if (!request) {
+        await this.messageSender.sendMessage(chatId, messages.invalidCurrencyRequest);
+        return { handled: false };
+      }
+
       const result = await this.executeRequest(request);
       const responseText =
         request.type === 'conversion'

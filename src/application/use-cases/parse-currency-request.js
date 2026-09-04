@@ -1,11 +1,14 @@
 const DEFAULT_QUOTE_CURRENCY = 'USD';
 const CURRENCY_CODE = '[A-Za-z]{3}';
 const AMOUNT = '[0-9]+(?:[.,][0-9]+)?';
+const END_PUNCTUATION = '[.!?]?';
 
 const CONVERSION_PATTERN = new RegExp(
-  `^(${AMOUNT})\\s+(${CURRENCY_CODE})(?:\\s+(${CURRENCY_CODE}))?$`,
+  `^(${AMOUNT})\\s+(${CURRENCY_CODE})(?:\\s+(${CURRENCY_CODE}))?${END_PUNCTUATION}$`,
 );
-const RATE_PATTERN = new RegExp(`^(${CURRENCY_CODE})(?:\\s+(${CURRENCY_CODE}))?$`);
+const RATE_PATTERN = new RegExp(
+  `^(${CURRENCY_CODE})(?:\\s+(${CURRENCY_CODE}))?${END_PUNCTUATION}$`,
+);
 
 export function parseCurrencyRequest(text) {
   if (typeof text !== 'string') {

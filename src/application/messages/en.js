@@ -19,6 +19,8 @@ export const ENGLISH_MESSAGES = Object.freeze({
     'EUR GBP — EUR to GBP rate',
     '100 EUR — convert EUR to USD',
     '100 EUR GBP — convert EUR to GBP',
+    'convert 100 EUR to GBP — conversational conversion',
+    'show USD to GBP rate — conversational rate request',
     '',
     'Available commands:',
     '/start — meet Convertic',
@@ -31,6 +33,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
   invalidCurrencyRequest: [
     '🪄 I could not understand that currency spell.',
     'Try EUR, EUR GBP, 100 EUR, or 100 EUR GBP.',
+    'You can also write: convert 100 EUR to GBP.',
   ].join('\n'),
   currencyPairNotFound:
     '🔮 I could not find that currency pair. Check the three-letter currency codes and try again.',

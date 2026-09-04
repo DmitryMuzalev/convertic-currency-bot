@@ -19,6 +19,8 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     'EUR GBP — курс EUR к GBP',
     '100 EUR — конвертировать EUR в USD',
     '100 EUR GBP — конвертировать EUR в GBP',
+    'переведи 100 EUR в GBP — разговорная конвертация',
+    'покажи курс USD к GBP — разговорный запрос курса',
     '',
     'Доступные команды:',
     '/start — познакомиться с Convertic',
@@ -31,6 +33,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   invalidCurrencyRequest: [
     '🪄 Мне не удалось разобрать это валютное заклинание.',
     'Попробуй EUR, EUR GBP, 100 EUR или 100 EUR GBP.',
+    'Также можно написать: переведи 100 EUR в GBP.',
   ].join('\n'),
   currencyPairNotFound:
     '🔮 Мне не удалось найти эту валютную пару. Проверь трёхбуквенные коды валют и попробуй снова.',
