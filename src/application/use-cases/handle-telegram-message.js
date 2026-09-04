@@ -1,11 +1,24 @@
 import { ExchangeRateProviderError } from '#application/errors/exchange-rate-provider-error.js';
 import { createCurrenciesMessage } from '#application/messages/format-currencies-message.js';
+import {
+  createCurrentSourceMessage,
+  createSelectedSourceMessage,
+  createSourcesMessage,
+} from '#application/messages/format-exchange-rate-sources-message.js';
 import { getMessages } from '#application/messages/get-messages.js';
+import { InvalidExchangeRateSourceError } from '#domain/errors/invalid-exchange-rate-source-error.js';
 
-const COMMAND_PATTERN = /^\/([a-z]+)(?:@[a-z0-9_]+)?(?:\s|$)/i;
+const COMMAND_PATTERN = /^\/([a-z]+)(?:@[a-z0-9_]+)?(?:\s+(.*))?$/i;
 
 export class HandleTelegramMessage {
-  constructor({ handleCurrencyMessage, listCurrencies, messageSender } = {}) {
+  constructor({
+    handleCurrencyMessage,
+    listCurrencies,
+    listExchangeRateSources,
+    selectExchangeRateSource,
+    userPreferencesRepository,
+    messageSender,
+  } = {}) {
     if (!handleCurrencyMessage || typeof handleCurrencyMessage.execute !== 'function') {
       throw new TypeError('handleCurrencyMessage must implement execute()');
     }
@@ -18,35 +31,61 @@ export class HandleTelegramMessage {
       throw new TypeError('listCurrencies must implement execute()');
     }
 
+    if (!listExchangeRateSources || typeof listExchangeRateSources.execute !== 'function') {
+      throw new TypeError('listExchangeRateSources must implement execute()');
+    }
+
+    if (!selectExchangeRateSource || typeof selectExchangeRateSource.execute !== 'function') {
+      throw new TypeError('selectExchangeRateSource must implement execute()');
+    }
+
+    if (
+      !userPreferencesRepository ||
+      typeof userPreferencesRepository.getExchangeRateSource !== 'function'
+    ) {
+      throw new TypeError('userPreferencesRepository must implement getExchangeRateSource()');
+    }
+
     this.handleCurrencyMessage = handleCurrencyMessage;
     this.listCurrencies = listCurrencies;
+    this.listExchangeRateSources = listExchangeRateSources;
+    this.selectExchangeRateSource = selectExchangeRateSource;
+    this.userPreferencesRepository = userPreferencesRepository;
     this.messageSender = messageSender;
   }
 
-  async execute({ chatId, text, languageCode } = {}) {
+  async execute({ chatId, userId, text, languageCode } = {}) {
     const command = extractCommand(text);
     const messages = getMessages(languageCode);
 
     if (command === null) {
-      return this.handleCurrencyMessage.execute({ chatId, text, languageCode });
+      return this.handleCurrencyMessage.execute({ chatId, userId, text, languageCode });
     }
 
-    if (command === 'start') {
+    if (command.name === 'start') {
       await this.messageSender.sendMessage(chatId, messages.start);
-      return { handled: true, command };
+      return { handled: true, command: command.name };
     }
 
-    if (command === 'help') {
+    if (command.name === 'help') {
       await this.messageSender.sendMessage(chatId, messages.help);
-      return { handled: true, command };
+      return { handled: true, command: command.name };
     }
 
-    if (command === 'currencies') {
+    if (command.name === 'currencies') {
       return this.handleCurrenciesCommand(chatId, messages);
     }
 
+    if (command.name === 'sources') {
+      return this.handleSourcesCommand(chatId, messages);
+    }
+
+    if (command.name === 'source') {
+      return this.handleSourceCommand({ chatId, userId, source: command.argument, messages });
+    }
+
     await this.messageSender.sendMessage(chatId, messages.unknownCommand);
-    return { handled: false, command };
+    return { handled: false, command: command.name };
   }
 
   async handleCurrenciesCommand(chatId, messages) {
@@ -65,6 +104,57 @@ export class HandleTelegramMessage {
       return { handled: false, command: 'currencies' };
     }
   }
+
+  async handleSourcesCommand(chatId, messages) {
+    try {
+      const sources = await this.listExchangeRateSources.execute();
+      const responseText = createSourcesMessage(sources, messages);
+
+      await this.messageSender.sendMessage(chatId, responseText);
+      return { handled: true, command: 'sources', sources };
+    } catch (error) {
+      if (!(error instanceof ExchangeRateProviderError)) {
+        throw error;
+      }
+
+      await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+      return { handled: false, command: 'sources' };
+    }
+  }
+
+  async handleSourceCommand({ chatId, userId, source, messages }) {
+    try {
+      if (source === '') {
+        const currentSource = await this.userPreferencesRepository.getExchangeRateSource(userId);
+        await this.messageSender.sendMessage(
+          chatId,
+          createCurrentSourceMessage(currentSource, messages),
+        );
+
+        return { handled: true, command: 'source', source: currentSource };
+      }
+
+      const selectedSource = await this.selectExchangeRateSource.execute({ userId, source });
+      await this.messageSender.sendMessage(
+        chatId,
+        createSelectedSourceMessage(selectedSource, messages),
+      );
+
+      return { handled: true, command: 'source', source: selectedSource?.key ?? null };
+    } catch (error) {
+      if (error instanceof InvalidExchangeRateSourceError) {
+        await this.messageSender.sendMessage(chatId, messages.invalidSource);
+        return { handled: false, command: 'source' };
+      }
+
+      if (error instanceof ExchangeRateProviderError) {
+        await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+        return { handled: false, command: 'source' };
+      }
+
+      throw error;
+    }
+  }
 }
 
 function extractCommand(text) {
@@ -74,5 +164,10 @@ function extractCommand(text) {
 
   const match = text.trim().match(COMMAND_PATTERN);
 
-  return match ? match[1].toLowerCase() : null;
+  return match
+    ? {
+        name: match[1].toLowerCase(),
+        argument: match[2]?.trim() ?? '',
+      }
+    : null;
 }

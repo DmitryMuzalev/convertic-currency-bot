@@ -18,6 +18,7 @@ export class HandleCurrencyMessage {
     getExchangeRate,
     getMultipleExchangeRates,
     convertCurrency,
+    userPreferencesRepository,
     messageSender,
   } = {}) {
     if (!recognizeCurrencyRequest || typeof recognizeCurrencyRequest.execute !== 'function') {
@@ -40,15 +41,24 @@ export class HandleCurrencyMessage {
       throw new TypeError('messageSender must implement sendMessage()');
     }
 
+    if (
+      !userPreferencesRepository ||
+      typeof userPreferencesRepository.getExchangeRateSource !== 'function'
+    ) {
+      throw new TypeError('userPreferencesRepository must implement getExchangeRateSource()');
+    }
+
     this.recognizeCurrencyRequest = recognizeCurrencyRequest;
     this.getExchangeRate = getExchangeRate;
     this.getMultipleExchangeRates = getMultipleExchangeRates;
     this.convertCurrency = convertCurrency;
+    this.userPreferencesRepository = userPreferencesRepository;
     this.messageSender = messageSender;
   }
 
-  async execute({ chatId, text, languageCode } = {}) {
+  async execute({ chatId, userId, text, languageCode } = {}) {
     const messages = getMessages(languageCode);
+    let selectedSource = null;
 
     try {
       const request = await this.recognizeCurrencyRequest.execute(text);
@@ -58,12 +68,14 @@ export class HandleCurrencyMessage {
         return { handled: false };
       }
 
-      const result = await this.executeRequest(request);
-      const responseText = this.createResponseText(request, result, messages);
+      selectedSource = await this.userPreferencesRepository.getExchangeRateSource(userId);
+      const requestWithSource = { ...request, source: selectedSource };
+      const result = await this.executeRequest(requestWithSource);
+      const responseText = this.createResponseText(requestWithSource, result, messages);
 
       await this.messageSender.sendMessage(chatId, responseText);
 
-      return { handled: true, request, result };
+      return { handled: true, request: requestWithSource, result };
     } catch (error) {
       if (error instanceof InvalidExchangeRateDateError) {
         await this.messageSender.sendMessage(chatId, messages.invalidExchangeRateDate);
@@ -81,9 +93,11 @@ export class HandleCurrencyMessage {
 
       if (error instanceof ExchangeRateProviderError) {
         const message =
-          error.statusCode === 422
-            ? messages.currencyPairNotFound
-            : messages.exchangeRateUnavailable;
+          selectedSource && error.statusCode === 422
+            ? messages.sourceUnavailableForPair
+            : error.statusCode === 422
+              ? messages.currencyPairNotFound
+              : messages.exchangeRateUnavailable;
 
         await this.messageSender.sendMessage(chatId, message);
         return { handled: false };

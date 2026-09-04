@@ -8,6 +8,7 @@ export function registerTelegramWebhookRoute(app, { handleTelegramMessage }) {
 
     await handleTelegramMessage.execute({
       chatId: message.chat.id,
+      userId: message.from.id,
       text: message.text,
       languageCode: message.from?.language_code,
     });
@@ -22,7 +23,8 @@ function getTextMessage(update) {
   if (
     typeof message?.text !== 'string' ||
     message.text.trim() === '' ||
-    !isValidChatId(message.chat?.id)
+    !isValidIdentifier(message.chat?.id) ||
+    !isValidIdentifier(message.from?.id)
   ) {
     return null;
   }
@@ -30,9 +32,9 @@ function getTextMessage(update) {
   return message;
 }
 
-function isValidChatId(chatId) {
+function isValidIdentifier(identifier) {
   return (
-    (typeof chatId === 'number' && Number.isSafeInteger(chatId)) ||
-    (typeof chatId === 'string' && chatId.trim() !== '')
+    (typeof identifier === 'number' && Number.isSafeInteger(identifier)) ||
+    (typeof identifier === 'string' && identifier.trim() !== '')
   );
 }

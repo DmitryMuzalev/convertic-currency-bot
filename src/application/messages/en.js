@@ -29,6 +29,9 @@ export const ENGLISH_MESSAGES = Object.freeze({
     '/start — meet Convertic',
     '/help — show these instructions',
     '/currencies — show supported currencies',
+    '/sources — show central-bank sources',
+    '/source ECB — select a source',
+    '/source AUTO — use the automatic source',
     '',
     'More currency tricks are coming soon! ✨',
   ].join('\n'),
@@ -51,6 +54,16 @@ export const ENGLISH_MESSAGES = Object.freeze({
   historicalMultipleRatesHeading: '🕰️ Several rates from the archives:',
   currenciesHeading: '🎩 Currencies in my spell book',
   currenciesHint: 'Send any code to reveal its rate against USD.',
+  sourcesHeading: '🏦 Sources in the Frankfurter archive',
+  sourcesHint: 'Choose one with /source ECB, or return to automatic mode with /source AUTO.',
+  currentSourceLabel: '🏦 Your current source',
+  sourceSelectedHeading: '✨ Source selected',
+  automaticSourceSelected: '✨ Automatic Frankfurter source selection is active.',
+  sourceLabel: '🏦 Source',
+  automaticSourceName: 'AUTO (Frankfurter blend)',
+  invalidSource: '🔮 I could not find that source. Use /sources to see the available source keys.',
+  sourceUnavailableForPair:
+    '🏦 Your selected source has no rate for that currency pair or date. Choose another source with /source.',
   invalidExchangeRateDate:
     '🕰️ That date is outside my spell book. Use YYYY-MM-DD and do not choose a future date.',
 });

@@ -29,6 +29,9 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     '/start — познакомиться с Convertic',
     '/help — открыть эту инструкцию',
     '/currencies — показать доступные валюты',
+    '/sources — показать источники центральных банков',
+    '/source ECB — выбрать источник',
+    '/source AUTO — использовать автоматический источник',
     '',
     'Скоро в книге появятся новые валютные фокусы! ✨',
   ].join('\n'),
@@ -52,6 +55,16 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   historicalMultipleRatesHeading: '🕰️ Несколько курсов из валютных архивов:',
   currenciesHeading: '🎩 Валют в моей книге заклинаний',
   currenciesHint: 'Отправь любой код, чтобы узнать его курс к USD.',
+  sourcesHeading: '🏦 Источники в архиве Frankfurter',
+  sourcesHint: 'Выбери источник через /source ECB или верни автоматический режим: /source AUTO.',
+  currentSourceLabel: '🏦 Твой текущий источник',
+  sourceSelectedHeading: '✨ Источник выбран',
+  automaticSourceSelected: '✨ Включён автоматический выбор источника Frankfurter.',
+  sourceLabel: '🏦 Источник',
+  automaticSourceName: 'AUTO (смешанный курс Frankfurter)',
+  invalidSource: '🔮 Такой источник не найден. Используй /sources, чтобы увидеть доступные коды.',
+  sourceUnavailableForPair:
+    '🏦 В выбранном источнике нет курса для этой валютной пары или даты. Выбери другой через /source.',
   invalidExchangeRateDate:
     '🕰️ Такой даты нет в моей книге заклинаний. Используй формат ГГГГ-ММ-ДД и не выбирай будущую дату.',
 });

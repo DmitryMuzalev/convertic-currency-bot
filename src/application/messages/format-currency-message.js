@@ -1,21 +1,24 @@
-export function createRateMessage({ baseCurrency, quoteCurrency, rate, date }, messages) {
+export function createRateMessage({ baseCurrency, quoteCurrency, rate, date, source }, messages) {
   return createRateMessageWithHeading(
-    { baseCurrency, quoteCurrency, rate, date },
+    { baseCurrency, quoteCurrency, rate, date, source },
     messages,
     messages.rateHeading,
   );
 }
 
-export function createHistoricalRateMessage({ baseCurrency, quoteCurrency, rate, date }, messages) {
+export function createHistoricalRateMessage(
+  { baseCurrency, quoteCurrency, rate, date, source },
+  messages,
+) {
   return createRateMessageWithHeading(
-    { baseCurrency, quoteCurrency, rate, date },
+    { baseCurrency, quoteCurrency, rate, date, source },
     messages,
     messages.historicalRateHeading,
   );
 }
 
 function createRateMessageWithHeading(
-  { baseCurrency, quoteCurrency, rate, date },
+  { baseCurrency, quoteCurrency, rate, date, source },
   messages,
   heading,
 ) {
@@ -30,11 +33,13 @@ function createRateMessageWithHeading(
     lines.push('', `${messages.rateDateLabel}: ${date}`);
   }
 
+  lines.push(`${messages.sourceLabel}: ${formatSource(source, messages)}`);
+
   return lines.join('\n');
 }
 
 export function createConversionMessage(
-  { amount, baseCurrency, convertedAmount, quoteCurrency, rate, date },
+  { amount, baseCurrency, convertedAmount, quoteCurrency, rate, date, source },
   messages,
 ) {
   const lines = [
@@ -58,26 +63,28 @@ export function createConversionMessage(
     lines.push('', `${messages.rateDateLabel}: ${date}`);
   }
 
+  lines.push(`${messages.sourceLabel}: ${formatSource(source, messages)}`);
+
   return lines.join('\n');
 }
 
-export function createMultipleRatesMessage({ baseCurrency, rates }, messages) {
+export function createMultipleRatesMessage({ baseCurrency, rates, source }, messages) {
   return createMultipleRatesMessageWithHeading(
-    { baseCurrency, rates },
+    { baseCurrency, rates, source },
     messages,
     messages.multipleRatesHeading,
   );
 }
 
-export function createHistoricalMultipleRatesMessage({ baseCurrency, rates }, messages) {
+export function createHistoricalMultipleRatesMessage({ baseCurrency, rates, source }, messages) {
   return createMultipleRatesMessageWithHeading(
-    { baseCurrency, rates },
+    { baseCurrency, rates, source },
     messages,
     messages.historicalMultipleRatesHeading,
   );
 }
 
-function createMultipleRatesMessageWithHeading({ baseCurrency, rates }, messages, heading) {
+function createMultipleRatesMessageWithHeading({ baseCurrency, rates, source }, messages, heading) {
   const dates = new Set(rates.map(rate => rate.date));
   const showDatePerRate = dates.size > 1;
   const rateLines = rates.map(rate => {
@@ -91,7 +98,13 @@ function createMultipleRatesMessageWithHeading({ baseCurrency, rates }, messages
     lines.push('', `${messages.rateDateLabel}: ${rates[0].date}`);
   }
 
+  lines.push(`${messages.sourceLabel}: ${formatSource(source, messages)}`);
+
   return lines.join('\n');
+}
+
+function formatSource(source, messages) {
+  return source ?? messages.automaticSourceName;
 }
 
 function formatNumber(value, locale) {
