@@ -1,9 +1,11 @@
+import { ExchangeRateProviderError } from '#application/errors/exchange-rate-provider-error.js';
+import { createCurrenciesMessage } from '#application/messages/format-currencies-message.js';
 import { getMessages } from '#application/messages/get-messages.js';
 
 const COMMAND_PATTERN = /^\/([a-z]+)(?:@[a-z0-9_]+)?(?:\s|$)/i;
 
 export class HandleTelegramMessage {
-  constructor({ handleCurrencyMessage, messageSender } = {}) {
+  constructor({ handleCurrencyMessage, listCurrencies, messageSender } = {}) {
     if (!handleCurrencyMessage || typeof handleCurrencyMessage.execute !== 'function') {
       throw new TypeError('handleCurrencyMessage must implement execute()');
     }
@@ -12,7 +14,12 @@ export class HandleTelegramMessage {
       throw new TypeError('messageSender must implement sendMessage()');
     }
 
+    if (!listCurrencies || typeof listCurrencies.execute !== 'function') {
+      throw new TypeError('listCurrencies must implement execute()');
+    }
+
     this.handleCurrencyMessage = handleCurrencyMessage;
+    this.listCurrencies = listCurrencies;
     this.messageSender = messageSender;
   }
 
@@ -34,8 +41,29 @@ export class HandleTelegramMessage {
       return { handled: true, command };
     }
 
+    if (command === 'currencies') {
+      return this.handleCurrenciesCommand(chatId, messages);
+    }
+
     await this.messageSender.sendMessage(chatId, messages.unknownCommand);
     return { handled: false, command };
+  }
+
+  async handleCurrenciesCommand(chatId, messages) {
+    try {
+      const currencies = await this.listCurrencies.execute();
+      const responseText = createCurrenciesMessage(currencies, messages);
+
+      await this.messageSender.sendMessage(chatId, responseText);
+      return { handled: true, command: 'currencies', currencies };
+    } catch (error) {
+      if (!(error instanceof ExchangeRateProviderError)) {
+        throw error;
+      }
+
+      await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+      return { handled: false, command: 'currencies' };
+    }
   }
 }
 

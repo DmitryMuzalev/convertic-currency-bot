@@ -2,6 +2,7 @@ import { ExchangeRateProviderError } from '#application/errors/exchange-rate-pro
 import { ExchangeRateProvider } from '#application/ports/exchange-rate-provider.js';
 
 const DEFAULT_BASE_URL = 'https://api.frankfurter.dev/v2';
+const CURRENCY_CODE_PATTERN = /^[A-Z]{3}$/;
 
 export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
   constructor({ baseUrl = DEFAULT_BASE_URL, fetchFunction = globalThis.fetch } = {}) {
@@ -23,6 +24,48 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       encodeURIComponent(quoteCurrency),
     ].join('/');
 
+    const payload = await this.fetchJson(url);
+
+    if (
+      payload.base !== baseCurrency ||
+      payload.quote !== quoteCurrency ||
+      typeof payload.date !== 'string' ||
+      typeof payload.rate !== 'number' ||
+      !Number.isFinite(payload.rate) ||
+      payload.rate <= 0
+    ) {
+      throw new ExchangeRateProviderError('Exchange rate provider returned an invalid rate');
+    }
+
+    return {
+      baseCurrency: payload.base,
+      quoteCurrency: payload.quote,
+      rate: payload.rate,
+      date: payload.date,
+    };
+  }
+
+  async listCurrencies() {
+    const payload = await this.fetchJson(`${this.baseUrl}/currencies`);
+
+    if (!Array.isArray(payload) || !payload.every(isValidCurrency)) {
+      throw new ExchangeRateProviderError(
+        'Exchange rate provider returned an invalid currency catalog',
+      );
+    }
+
+    return Object.freeze(
+      payload.map(currency =>
+        Object.freeze({
+          code: currency.iso_code,
+          name: currency.name,
+          symbol: currency.symbol,
+        }),
+      ),
+    );
+  }
+
+  async fetchJson(url) {
     let response;
 
     try {
@@ -44,34 +87,26 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       );
     }
 
-    let payload;
-
     try {
-      payload = await response.json();
+      return await response.json();
     } catch (error) {
       throw new ExchangeRateProviderError('Exchange rate provider returned invalid JSON', {
         cause: error,
       });
     }
-
-    if (
-      payload.base !== baseCurrency ||
-      payload.quote !== quoteCurrency ||
-      typeof payload.date !== 'string' ||
-      typeof payload.rate !== 'number' ||
-      !Number.isFinite(payload.rate) ||
-      payload.rate <= 0
-    ) {
-      throw new ExchangeRateProviderError('Exchange rate provider returned an invalid rate');
-    }
-
-    return {
-      baseCurrency: payload.base,
-      quoteCurrency: payload.quote,
-      rate: payload.rate,
-      date: payload.date,
-    };
   }
+}
+
+function isValidCurrency(currency) {
+  return (
+    currency !== null &&
+    typeof currency === 'object' &&
+    typeof currency.iso_code === 'string' &&
+    CURRENCY_CODE_PATTERN.test(currency.iso_code) &&
+    typeof currency.name === 'string' &&
+    currency.name.trim() !== '' &&
+    (currency.symbol === null || typeof currency.symbol === 'string')
+  );
 }
 
 async function readProviderErrorMessage(response) {

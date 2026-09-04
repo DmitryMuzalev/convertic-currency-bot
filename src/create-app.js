@@ -4,12 +4,14 @@ import { ConvertCurrency } from '#application/use-cases/convert-currency.js';
 import { GetExchangeRate } from '#application/use-cases/get-exchange-rate.js';
 import { HandleCurrencyMessage } from '#application/use-cases/handle-currency-message.js';
 import { HandleTelegramMessage } from '#application/use-cases/handle-telegram-message.js';
+import { ListCurrencies } from '#application/use-cases/list-currencies.js';
 import { buildApp } from '#infrastructure/http/build-app.js';
 
 export function createApp({ telegramBotToken, logger = false } = {}) {
   const exchangeRateProvider = new FrankfurterExchangeRateProvider();
   const getExchangeRate = new GetExchangeRate(exchangeRateProvider);
   const convertCurrency = new ConvertCurrency(getExchangeRate);
+  const listCurrencies = new ListCurrencies(exchangeRateProvider);
   const messageSender = new TelegramBotApi({ botToken: telegramBotToken });
   const handleCurrencyMessage = new HandleCurrencyMessage({
     getExchangeRate,
@@ -18,6 +20,7 @@ export function createApp({ telegramBotToken, logger = false } = {}) {
   });
   const handleTelegramMessage = new HandleTelegramMessage({
     handleCurrencyMessage,
+    listCurrencies,
     messageSender,
   });
 

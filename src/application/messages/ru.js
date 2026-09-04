@@ -23,6 +23,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     'Доступные команды:',
     '/start — познакомиться с Convertic',
     '/help — открыть эту инструкцию',
+    '/currencies — показать доступные валюты',
     '',
     'Скоро в книге появятся новые валютные фокусы! ✨',
   ].join('\n'),
@@ -40,4 +41,6 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   rateLabel: 'Курс',
   reverseLabel: 'Обратный курс',
   rateDateLabel: '📅 Дата курса',
+  currenciesHeading: '🎩 Валют в моей книге заклинаний',
+  currenciesHint: 'Отправь любой код, чтобы узнать его курс к USD.',
 });

@@ -23,6 +23,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
     'Available commands:',
     '/start — meet Convertic',
     '/help — show these instructions',
+    '/currencies — show supported currencies',
     '',
     'More currency tricks are coming soon! ✨',
   ].join('\n'),
@@ -39,4 +40,6 @@ export const ENGLISH_MESSAGES = Object.freeze({
   rateLabel: 'Rate',
   reverseLabel: 'Reverse',
   rateDateLabel: '📅 Rate date',
+  currenciesHeading: '🎩 Currencies in my spell book',
+  currenciesHint: 'Send any code to reveal its rate against USD.',
 });
