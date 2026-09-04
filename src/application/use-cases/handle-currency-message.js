@@ -1,5 +1,7 @@
 import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
 
+import { extractCurrencyCodeFromText } from './extract-currency-code-from-text.js';
+
 const INVALID_CURRENCY_MESSAGE = 'Send a three-letter currency code, for example EUR.';
 
 export class HandleCurrencyMessage {
@@ -16,7 +18,8 @@ export class HandleCurrencyMessage {
     this.messageSender = messageSender;
   }
 
-  async execute({ chatId, currencyCode } = {}) {
+  async execute({ chatId, text } = {}) {
+    const currencyCode = extractCurrencyCodeFromText(text);
     let rate;
 
     try {
@@ -30,14 +33,13 @@ export class HandleCurrencyMessage {
       return { handled: false };
     }
 
-    const normalizedCurrencyCode = currencyCode.trim().toUpperCase();
-    const text = `1 ${normalizedCurrencyCode} = ${rate} USD`;
+    const responseText = `1 ${currencyCode} = ${rate} USD`;
 
-    await this.messageSender.sendMessage(chatId, text);
+    await this.messageSender.sendMessage(chatId, responseText);
 
     return {
       handled: true,
-      currencyCode: normalizedCurrencyCode,
+      currencyCode,
       rate,
     };
   }

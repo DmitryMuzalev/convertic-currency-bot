@@ -8,7 +8,7 @@ export function registerTelegramWebhookRoute(app, { handleCurrencyMessage }) {
 
     await handleCurrencyMessage.execute({
       chatId: message.chat.id,
-      currencyCode: message.text,
+      text: message.text,
     });
 
     return { ok: true };
