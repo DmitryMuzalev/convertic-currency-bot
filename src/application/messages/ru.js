@@ -46,7 +46,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   currencyPairNotFound:
     '🔮 Мне не удалось найти эту валютную пару. Проверь трёхбуквенные коды валют и попробуй снова.',
   exchangeRateUnavailable:
-    '☁️ Мой хрустальный шар немного помутнел. Попробуй ещё раз через минуту.',
+    '☁️ Мой хрустальный шар немного помутнел. Попробуй ещё раз через минуту или выбери другой источник через /sources.',
   rateHeading: '🎩 Та-дам! Раскрываю валютный курс:',
   historicalRateHeading: '🕰️ Курс из валютных архивов:',
   conversionHeading: '✨ Превращение завершено!',
@@ -56,12 +56,12 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   multipleRatesHeading: '🎩 Одна валюта — несколько превращений:',
   historicalMultipleRatesHeading: '🕰️ Несколько курсов из валютных архивов:',
   currenciesHeading: '🎩 Книга валютных заклинаний',
-  currenciesAvailableLabel: 'валют доступно',
+  currenciesAvailableLabel: 'Доступно валют',
   popularCurrenciesHeading: '⭐ Популярные заклинания',
   allCurrenciesHeading: '🔤 Полный каталог',
   currenciesHint: 'Отправь любой код, чтобы узнать его курс к USD.',
   sourcesHeading: '🏦 Источники в архиве Frankfurter',
-  sourcesAvailableLabel: 'источников доступно',
+  sourcesAvailableLabel: 'Доступно источников',
   sourcesHint: 'Выбери источник через /source ECB или верни автоматический режим: /source AUTO.',
   currentSourceLabel: '🏦 Твой текущий источник',
   sourceSelectedHeading: '✨ Источник выбран',

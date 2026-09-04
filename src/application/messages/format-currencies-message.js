@@ -23,15 +23,15 @@ export function createCurrenciesMessage(currencies, messages) {
   const catalogLines = [];
 
   for (const [letter, group] of groups) {
-    catalogLines.push(letter, ...formatCurrencyLines(group), '');
+    catalogLines.push(letter, ...formatCurrencyLines(group, formatCurrencyCode), '');
   }
 
   return [
     messages.currenciesHeading,
-    `${currencies.length} ${messages.currenciesAvailableLabel}`,
+    `${messages.currenciesAvailableLabel}: ${currencies.length}`,
     '',
     messages.popularCurrenciesHeading,
-    ...formatCurrencyLines(popularCurrencies),
+    ...formatCurrencyLines(popularCurrencies, formatCurrencyLabel),
     '',
     messages.allCurrenciesHeading,
     '',
@@ -54,19 +54,23 @@ function groupCurrenciesByFirstLetter(currencies) {
   return groups;
 }
 
-function formatCurrencyLines(currencies) {
+function formatCurrencyLines(currencies, formatCurrency) {
   const lines = [];
 
   for (let index = 0; index < currencies.length; index += CURRENCIES_PER_LINE) {
     lines.push(
       currencies
         .slice(index, index + CURRENCIES_PER_LINE)
-        .map(formatCurrencyLabel)
+        .map(formatCurrency)
         .join(' · '),
     );
   }
 
   return lines;
+}
+
+function formatCurrencyCode(currency) {
+  return currency.code;
 }
 
 function formatCurrencyLabel(currency) {

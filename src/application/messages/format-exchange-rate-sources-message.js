@@ -5,7 +5,7 @@ export function createSourcesMessage(sources, messages) {
 
   return [
     messages.sourcesHeading,
-    `${sources.length} ${messages.sourcesAvailableLabel}`,
+    `${messages.sourcesAvailableLabel}: ${sources.length}`,
     '',
     ...sourceLines,
     '',
