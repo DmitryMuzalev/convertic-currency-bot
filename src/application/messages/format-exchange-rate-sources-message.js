@@ -1,19 +1,11 @@
-const SOURCES_PER_LINE = 10;
-
 export function createSourcesMessage(sources, messages) {
-  const sourceLines = [];
-
-  for (let index = 0; index < sources.length; index += SOURCES_PER_LINE) {
-    sourceLines.push(
-      sources
-        .slice(index, index + SOURCES_PER_LINE)
-        .map(source => source.key)
-        .join(' · '),
-    );
-  }
+  const sourceLines = sources.map(
+    source => `${createFlag(source.countryCode)} ${source.key} — ${source.name}`,
+  );
 
   return [
-    `${messages.sourcesHeading}: ${sources.length}`,
+    messages.sourcesHeading,
+    `${sources.length} ${messages.sourcesAvailableLabel}`,
     '',
     ...sourceLines,
     '',
@@ -31,4 +23,14 @@ export function createSelectedSourceMessage(source, messages) {
   }
 
   return `${messages.sourceSelectedHeading}: ${source.key} — ${source.name}`;
+}
+
+function createFlag(countryCode) {
+  if (typeof countryCode !== 'string' || !/^[A-Z]{2}$/.test(countryCode)) {
+    return '🏦';
+  }
+
+  return String.fromCodePoint(
+    ...[...countryCode].map(character => 0x1f1e6 + character.charCodeAt(0) - 65),
+  );
 }
