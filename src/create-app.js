@@ -1,6 +1,7 @@
 import { FrankfurterExchangeRateProvider } from '#adapters/exchange-rates/frankfurter-exchange-rate-provider.js';
 import { InMemoryUserPreferencesRepository } from '#adapters/storage/in-memory-user-preferences-repository.js';
 import { TelegramBotApi } from '#adapters/telegram/telegram-bot-api.js';
+import { CompareExchangeRateSources } from '#application/use-cases/compare-exchange-rate-sources.js';
 import { ConvertCurrency } from '#application/use-cases/convert-currency.js';
 import { GetExchangeRate } from '#application/use-cases/get-exchange-rate.js';
 import { GetMultipleExchangeRates } from '#application/use-cases/get-multiple-exchange-rates.js';
@@ -19,6 +20,10 @@ export function createApp({ telegramBotToken, logger = false } = {}) {
   const convertCurrency = new ConvertCurrency(getExchangeRate);
   const listCurrencies = new ListCurrencies(exchangeRateProvider);
   const listExchangeRateSources = new ListExchangeRateSources(exchangeRateProvider);
+  const compareExchangeRateSources = new CompareExchangeRateSources({
+    getExchangeRate,
+    listExchangeRateSources,
+  });
   const userPreferencesRepository = new InMemoryUserPreferencesRepository();
   const selectExchangeRateSource = new SelectExchangeRateSource({
     listExchangeRateSources,
@@ -38,6 +43,7 @@ export function createApp({ telegramBotToken, logger = false } = {}) {
     handleCurrencyMessage,
     listCurrencies,
     listExchangeRateSources,
+    compareExchangeRateSources,
     selectExchangeRateSource,
     userPreferencesRepository,
     messageSender,

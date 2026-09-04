@@ -5,7 +5,9 @@ import {
   createSelectedSourceMessage,
   createSourcesMessage,
 } from '#application/messages/format-exchange-rate-sources-message.js';
+import { createSourceComparisonMessage } from '#application/messages/format-exchange-rate-source-comparison-message.js';
 import { getMessages } from '#application/messages/get-messages.js';
+import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
 import { InvalidExchangeRateSourceError } from '#domain/errors/invalid-exchange-rate-source-error.js';
 
 const COMMAND_PATTERN = /^\/([a-z]+)(?:@[a-z0-9_]+)?(?:\s+(.*))?$/i;
@@ -15,6 +17,7 @@ export class HandleTelegramMessage {
     handleCurrencyMessage,
     listCurrencies,
     listExchangeRateSources,
+    compareExchangeRateSources,
     selectExchangeRateSource,
     userPreferencesRepository,
     messageSender,
@@ -35,6 +38,10 @@ export class HandleTelegramMessage {
       throw new TypeError('listExchangeRateSources must implement execute()');
     }
 
+    if (!compareExchangeRateSources || typeof compareExchangeRateSources.execute !== 'function') {
+      throw new TypeError('compareExchangeRateSources must implement execute()');
+    }
+
     if (!selectExchangeRateSource || typeof selectExchangeRateSource.execute !== 'function') {
       throw new TypeError('selectExchangeRateSource must implement execute()');
     }
@@ -49,6 +56,7 @@ export class HandleTelegramMessage {
     this.handleCurrencyMessage = handleCurrencyMessage;
     this.listCurrencies = listCurrencies;
     this.listExchangeRateSources = listExchangeRateSources;
+    this.compareExchangeRateSources = compareExchangeRateSources;
     this.selectExchangeRateSource = selectExchangeRateSource;
     this.userPreferencesRepository = userPreferencesRepository;
     this.messageSender = messageSender;
@@ -82,6 +90,10 @@ export class HandleTelegramMessage {
 
     if (command.name === 'source') {
       return this.handleSourceCommand({ chatId, userId, source: command.argument, messages });
+    }
+
+    if (command.name === 'compare') {
+      return this.handleCompareCommand(chatId, command.argument, messages);
     }
 
     await this.messageSender.sendMessage(chatId, messages.unknownCommand);
@@ -150,6 +162,37 @@ export class HandleTelegramMessage {
       if (error instanceof ExchangeRateProviderError) {
         await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
         return { handled: false, command: 'source' };
+      }
+
+      throw error;
+    }
+  }
+
+  async handleCompareCommand(chatId, argument, messages) {
+    const [baseCurrency, quoteCurrency, ...sources] = argument.split(/\s+/).filter(Boolean);
+
+    try {
+      const comparison = await this.compareExchangeRateSources.execute({
+        baseCurrency,
+        quoteCurrency,
+        sources,
+      });
+      const responseText = createSourceComparisonMessage(comparison, messages);
+
+      await this.messageSender.sendMessage(chatId, responseText);
+      return { handled: true, command: 'compare', comparison };
+    } catch (error) {
+      if (
+        error instanceof InvalidCurrencyCodeError ||
+        error instanceof InvalidExchangeRateSourceError
+      ) {
+        await this.messageSender.sendMessage(chatId, messages.invalidComparisonRequest);
+        return { handled: false, command: 'compare' };
+      }
+
+      if (error instanceof ExchangeRateProviderError) {
+        await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+        return { handled: false, command: 'compare' };
       }
 
       throw error;

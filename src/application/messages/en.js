@@ -32,6 +32,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
     '/sources — show central-bank sources',
     '/source ECB — select a source',
     '/source AUTO — use the automatic source',
+    '/compare EUR USD ECB BOE — compare 2–5 sources',
     '',
     'More currency tricks are coming soon! ✨',
   ].join('\n'),
@@ -64,6 +65,10 @@ export const ENGLISH_MESSAGES = Object.freeze({
   invalidSource: '🔮 I could not find that source. Use /sources to see the available source keys.',
   sourceUnavailableForPair:
     '🏦 Your selected source has no rate for that currency pair or date. Choose another source with /source.',
+  comparisonHeading: '🎩 Central-bank showdown!',
+  comparisonSourceUnavailable: 'no rate for this currency pair',
+  invalidComparisonRequest:
+    '🪄 Use /compare EUR USD ECB BOE with two currency codes and 2–5 different source keys.',
   invalidExchangeRateDate:
     '🕰️ That date is outside my spell book. Use YYYY-MM-DD and do not choose a future date.',
 });

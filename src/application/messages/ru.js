@@ -32,6 +32,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     '/sources — показать источники центральных банков',
     '/source ECB — выбрать источник',
     '/source AUTO — использовать автоматический источник',
+    '/compare EUR USD ECB BOE — сравнить от 2 до 5 источников',
     '',
     'Скоро в книге появятся новые валютные фокусы! ✨',
   ].join('\n'),
@@ -65,6 +66,10 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   invalidSource: '🔮 Такой источник не найден. Используй /sources, чтобы увидеть доступные коды.',
   sourceUnavailableForPair:
     '🏦 В выбранном источнике нет курса для этой валютной пары или даты. Выбери другой через /source.',
+  comparisonHeading: '🎩 Битва центральных банков!',
+  comparisonSourceUnavailable: 'нет курса для этой валютной пары',
+  invalidComparisonRequest:
+    '🪄 Используй /compare EUR USD ECB BOE: два кода валют и от 2 до 5 разных источников.',
   invalidExchangeRateDate:
     '🕰️ Такой даты нет в моей книге заклинаний. Используй формат ГГГГ-ММ-ДД и не выбирай будущую дату.',
 });
