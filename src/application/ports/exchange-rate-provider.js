@@ -23,6 +23,22 @@ export class ExchangeRateProvider {
   }
 
   /**
+   * Returns rates for one base currency against several quote currencies.
+   *
+   * @param {object} request
+   * @param {string} request.baseCurrency
+   * @param {string[]} request.quoteCurrencies
+   * @returns {Promise<{
+   *   baseCurrency: string,
+   *   rates: Array<{quoteCurrency: string, rate: number, date: string}>
+   * }>}
+   */
+  async getRates(request) {
+    void request;
+    throw new Error('ExchangeRateProvider.getRates() must be implemented');
+  }
+
+  /**
    * Returns the currencies currently supported by the provider.
    *
    * @returns {Promise<Array<{

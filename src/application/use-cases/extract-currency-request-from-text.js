@@ -1,3 +1,5 @@
+import { MAX_QUOTE_CURRENCIES } from '#application/rules/currency-request-limits.js';
+
 import { parseCurrencyRequest } from './parse-currency-request.js';
 
 const TOKEN_PATTERN = /(?<![A-Za-z0-9_])(?:[A-Za-z]+|[0-9]+(?:[.,][0-9]+)?)(?![A-Za-z0-9_])/g;
@@ -27,7 +29,7 @@ export function extractCurrencyRequestFromText(text, currencies) {
     return extractConversionRequest(amountTokens[0], currencyTokens);
   }
 
-  if (currencyTokens.length < 1 || currencyTokens.length > 2) {
+  if (currencyTokens.length < 1 || currencyTokens.length > MAX_QUOTE_CURRENCIES + 1) {
     return null;
   }
 

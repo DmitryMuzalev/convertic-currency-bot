@@ -19,6 +19,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     'EUR GBP — курс EUR к GBP',
     '100 EUR — конвертировать EUR в USD',
     '100 EUR GBP — конвертировать EUR в GBP',
+    'EUR USD GBP JPY — показать несколько курсов EUR',
     'переведи 100 EUR в GBP — разговорная конвертация',
     'покажи курс USD к GBP — разговорный запрос курса',
     '',
@@ -32,7 +33,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   unknownCommand: '🎩 Такого заклинания в моей книге пока нет. Загляни в /help.',
   invalidCurrencyRequest: [
     '🪄 Мне не удалось разобрать это валютное заклинание.',
-    'Попробуй EUR, EUR GBP, 100 EUR или 100 EUR GBP.',
+    'Попробуй EUR, EUR GBP, 100 EUR, 100 EUR GBP или EUR USD GBP JPY.',
     'Также можно написать: переведи 100 EUR в GBP.',
   ].join('\n'),
   currencyPairNotFound:
@@ -44,6 +45,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
   rateLabel: 'Курс',
   reverseLabel: 'Обратный курс',
   rateDateLabel: '📅 Дата курса',
+  multipleRatesHeading: '🎩 Одна валюта — несколько превращений:',
   currenciesHeading: '🎩 Валют в моей книге заклинаний',
   currenciesHint: 'Отправь любой код, чтобы узнать его курс к USD.',
 });

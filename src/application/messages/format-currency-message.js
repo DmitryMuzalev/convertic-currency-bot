@@ -41,6 +41,23 @@ export function createConversionMessage(
   return lines.join('\n');
 }
 
+export function createMultipleRatesMessage({ baseCurrency, rates }, messages) {
+  const dates = new Set(rates.map(rate => rate.date));
+  const showDatePerRate = dates.size > 1;
+  const rateLines = rates.map(rate => {
+    const rateDate = showDatePerRate ? ` (${rate.date})` : '';
+
+    return `1 ${baseCurrency} = ${formatNumber(rate.rate, messages.locale)} ${rate.quoteCurrency}${rateDate}`;
+  });
+  const lines = [messages.multipleRatesHeading, '', ...rateLines];
+
+  if (dates.size === 1) {
+    lines.push('', `${messages.rateDateLabel}: ${rates[0].date}`);
+  }
+
+  return lines.join('\n');
+}
+
 function formatNumber(value, locale) {
   return new Intl.NumberFormat(locale, {
     maximumSignificantDigits: 8,

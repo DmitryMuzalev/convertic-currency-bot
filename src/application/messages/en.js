@@ -19,6 +19,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
     'EUR GBP — EUR to GBP rate',
     '100 EUR — convert EUR to USD',
     '100 EUR GBP — convert EUR to GBP',
+    'EUR USD GBP JPY — show several EUR rates',
     'convert 100 EUR to GBP — conversational conversion',
     'show USD to GBP rate — conversational rate request',
     '',
@@ -32,7 +33,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
   unknownCommand: '🎩 That spell is not in my book yet. Try /help to see what I can do.',
   invalidCurrencyRequest: [
     '🪄 I could not understand that currency spell.',
-    'Try EUR, EUR GBP, 100 EUR, or 100 EUR GBP.',
+    'Try EUR, EUR GBP, 100 EUR, 100 EUR GBP, or EUR USD GBP JPY.',
     'You can also write: convert 100 EUR to GBP.',
   ].join('\n'),
   currencyPairNotFound:
@@ -43,6 +44,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
   rateLabel: 'Rate',
   reverseLabel: 'Reverse',
   rateDateLabel: '📅 Rate date',
+  multipleRatesHeading: '🎩 One currency, several reveals:',
   currenciesHeading: '🎩 Currencies in my spell book',
   currenciesHint: 'Send any code to reveal its rate against USD.',
 });

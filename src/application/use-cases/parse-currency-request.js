@@ -1,3 +1,5 @@
+import { MAX_QUOTE_CURRENCIES } from '#application/rules/currency-request-limits.js';
+
 const DEFAULT_QUOTE_CURRENCY = 'USD';
 const CURRENCY_CODE = '[A-Za-z]{3}';
 const AMOUNT = '[0-9]+(?:[.,][0-9]+)?';
@@ -8,6 +10,9 @@ const CONVERSION_PATTERN = new RegExp(
 );
 const RATE_PATTERN = new RegExp(
   `^(${CURRENCY_CODE})(?:\\s+(${CURRENCY_CODE}))?${END_PUNCTUATION}$`,
+);
+const MULTIPLE_RATES_PATTERN = new RegExp(
+  `^${CURRENCY_CODE}(?:\\s+${CURRENCY_CODE}){2,${MAX_QUOTE_CURRENCIES}}${END_PUNCTUATION}$`,
 );
 
 export function parseCurrencyRequest(text) {
@@ -30,6 +35,19 @@ export function parseCurrencyRequest(text) {
       amount,
       baseCurrency: conversionMatch[2].toUpperCase(),
       quoteCurrency: (conversionMatch[3] ?? DEFAULT_QUOTE_CURRENCY).toUpperCase(),
+    };
+  }
+
+  if (MULTIPLE_RATES_PATTERN.test(normalizedText)) {
+    const [baseCurrency, ...quoteCurrencies] = normalizedText
+      .replace(/[.!?]$/, '')
+      .split(/\s+/)
+      .map(currencyCode => currencyCode.toUpperCase());
+
+    return {
+      type: 'multiple-rates',
+      baseCurrency,
+      quoteCurrencies,
     };
   }
 

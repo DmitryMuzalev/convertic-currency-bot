@@ -26,14 +26,7 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
 
     const payload = await this.fetchJson(url);
 
-    if (
-      payload.base !== baseCurrency ||
-      payload.quote !== quoteCurrency ||
-      typeof payload.date !== 'string' ||
-      typeof payload.rate !== 'number' ||
-      !Number.isFinite(payload.rate) ||
-      payload.rate <= 0
-    ) {
+    if (!isValidRate(payload, baseCurrency, quoteCurrency)) {
       throw new ExchangeRateProviderError('Exchange rate provider returned an invalid rate');
     }
 
@@ -42,6 +35,39 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       quoteCurrency: payload.quote,
       rate: payload.rate,
       date: payload.date,
+    };
+  }
+
+  async getRates({ baseCurrency, quoteCurrencies }) {
+    const quotes = quoteCurrencies.map(encodeURIComponent).join(',');
+    const url = `${this.baseUrl}/rates?base=${encodeURIComponent(baseCurrency)}&quotes=${quotes}`;
+    const payload = await this.fetchJson(url);
+
+    if (!Array.isArray(payload) || payload.length !== quoteCurrencies.length) {
+      throw new ExchangeRateProviderError('Exchange rate provider returned invalid rates');
+    }
+
+    const ratesByQuoteCurrency = new Map();
+
+    for (const rate of payload) {
+      if (
+        !quoteCurrencies.includes(rate?.quote) ||
+        !isValidRate(rate, baseCurrency, rate.quote) ||
+        ratesByQuoteCurrency.has(rate.quote)
+      ) {
+        throw new ExchangeRateProviderError('Exchange rate provider returned invalid rates');
+      }
+
+      ratesByQuoteCurrency.set(rate.quote, {
+        quoteCurrency: rate.quote,
+        rate: rate.rate,
+        date: rate.date,
+      });
+    }
+
+    return {
+      baseCurrency,
+      rates: quoteCurrencies.map(quoteCurrency => ratesByQuoteCurrency.get(quoteCurrency)),
     };
   }
 
@@ -95,6 +121,19 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       });
     }
   }
+}
+
+function isValidRate(rate, baseCurrency, quoteCurrency) {
+  return (
+    rate !== null &&
+    typeof rate === 'object' &&
+    rate.base === baseCurrency &&
+    rate.quote === quoteCurrency &&
+    typeof rate.date === 'string' &&
+    typeof rate.rate === 'number' &&
+    Number.isFinite(rate.rate) &&
+    rate.rate > 0
+  );
 }
 
 function isValidCurrency(currency) {
