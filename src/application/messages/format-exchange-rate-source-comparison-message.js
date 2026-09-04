@@ -7,18 +7,19 @@ export function createSourceComparisonMessage(
       return `🏦 ${comparison.source.key}: ${messages.comparisonSourceUnavailable}`;
     }
 
-    const rate = new Intl.NumberFormat(messages.locale, {
-      maximumSignificantDigits: 8,
-    }).format(comparison.rate);
-
-    return `🏦 ${comparison.source.key}: ${rate} ${quoteCurrency} · ${comparison.date}`;
+    return `🏦 ${comparison.source.key}: ${formatCurrencyValue(
+      comparison.rate,
+      quoteCurrency,
+      messages.locale,
+    )} · ${comparison.date}`;
   });
 
   return [
     messages.comparisonHeading,
     '',
-    `1 ${baseCurrency} → ${quoteCurrency}`,
+    `${formatCurrencyValue(1, baseCurrency, messages.locale)} → ${quoteCurrency}`,
     '',
     ...comparisonLines,
   ].join('\n');
 }
+import { formatCurrencyValue } from './format-currency-value.js';

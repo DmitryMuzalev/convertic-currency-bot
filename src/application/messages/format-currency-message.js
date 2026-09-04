@@ -1,3 +1,5 @@
+import { formatCurrencyValue } from './format-currency-value.js';
+
 export function createRateMessage({ baseCurrency, quoteCurrency, rate, date, source }, messages) {
   return createRateMessageWithHeading(
     { baseCurrency, quoteCurrency, rate, date, source },
@@ -25,8 +27,16 @@ function createRateMessageWithHeading(
   const lines = [
     heading,
     '',
-    `1 ${baseCurrency} = ${formatNumber(rate, messages.locale)} ${quoteCurrency}`,
-    `1 ${quoteCurrency} = ${formatNumber(1 / rate, messages.locale)} ${baseCurrency}`,
+    `${formatCurrencyValue(1, baseCurrency, messages.locale)} = ${formatCurrencyValue(
+      rate,
+      quoteCurrency,
+      messages.locale,
+    )}`,
+    `${messages.reverseLabel}: ${formatCurrencyValue(
+      1,
+      quoteCurrency,
+      messages.locale,
+    )} = ${formatCurrencyValue(1 / rate, baseCurrency, messages.locale)}`,
   ];
 
   if (date) {
@@ -45,18 +55,22 @@ export function createConversionMessage(
   const lines = [
     messages.conversionHeading,
     '',
-    `${formatNumber(amount, messages.locale)} ${baseCurrency} = ${formatNumber(
+    `${formatCurrencyValue(amount, baseCurrency, messages.locale)} → ${formatCurrencyValue(
       convertedAmount,
+      quoteCurrency,
       messages.locale,
-    )} ${quoteCurrency}`,
-    `${messages.rateLabel}: 1 ${baseCurrency} = ${formatNumber(
-      rate,
+    )}`,
+    '',
+    `${messages.rateLabel}: ${formatCurrencyValue(
+      1,
+      baseCurrency,
       messages.locale,
-    )} ${quoteCurrency}`,
-    `${messages.reverseLabel}: 1 ${quoteCurrency} = ${formatNumber(
-      1 / rate,
+    )} = ${formatCurrencyValue(rate, quoteCurrency, messages.locale)}`,
+    `${messages.reverseLabel}: ${formatCurrencyValue(
+      1,
+      quoteCurrency,
       messages.locale,
-    )} ${baseCurrency}`,
+    )} = ${formatCurrencyValue(1 / rate, baseCurrency, messages.locale)}`,
   ];
 
   if (date) {
@@ -88,11 +102,11 @@ function createMultipleRatesMessageWithHeading({ baseCurrency, rates, source }, 
   const dates = new Set(rates.map(rate => rate.date));
   const showDatePerRate = dates.size > 1;
   const rateLines = rates.map(rate => {
-    const rateDate = showDatePerRate ? ` (${rate.date})` : '';
+    const rateDate = showDatePerRate ? ` · ${rate.date}` : '';
 
-    return `1 ${baseCurrency} = ${formatNumber(rate.rate, messages.locale)} ${rate.quoteCurrency}${rateDate}`;
+    return `→ ${formatCurrencyValue(rate.rate, rate.quoteCurrency, messages.locale)}${rateDate}`;
   });
-  const lines = [heading, '', ...rateLines];
+  const lines = [heading, '', formatCurrencyValue(1, baseCurrency, messages.locale), ...rateLines];
 
   if (dates.size === 1) {
     lines.push('', `${messages.rateDateLabel}: ${rates[0].date}`);
@@ -105,10 +119,4 @@ function createMultipleRatesMessageWithHeading({ baseCurrency, rates, source }, 
 
 function formatSource(source, messages) {
   return source ?? messages.automaticSourceName;
-}
-
-function formatNumber(value, locale) {
-  return new Intl.NumberFormat(locale, {
-    maximumSignificantDigits: 8,
-  }).format(value);
 }

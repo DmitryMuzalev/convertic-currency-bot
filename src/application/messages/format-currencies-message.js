@@ -1,13 +1,13 @@
-const CODES_PER_LINE = 12;
+const CURRENCIES_PER_LINE = 6;
 
 export function createCurrenciesMessage(currencies, messages) {
   const codeLines = [];
 
-  for (let index = 0; index < currencies.length; index += CODES_PER_LINE) {
+  for (let index = 0; index < currencies.length; index += CURRENCIES_PER_LINE) {
     codeLines.push(
       currencies
-        .slice(index, index + CODES_PER_LINE)
-        .map(currency => currency.code)
+        .slice(index, index + CURRENCIES_PER_LINE)
+        .map(formatCurrencyLabel)
         .join(' · '),
     );
   }
@@ -19,4 +19,8 @@ export function createCurrenciesMessage(currencies, messages) {
     '',
     messages.currenciesHint,
   ].join('\n');
+}
+
+function formatCurrencyLabel(currency) {
+  return currency.symbol ? `${currency.symbol} ${currency.code}` : currency.code;
 }
