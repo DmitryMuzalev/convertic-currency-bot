@@ -16,14 +16,15 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
     this.fetchFunction = fetchFunction;
   }
 
-  async getRate({ baseCurrency, quoteCurrency, date = null }) {
+  async getRate({ baseCurrency, quoteCurrency, date = null, source = null }) {
     const path = [
       this.baseUrl,
       'rate',
       encodeURIComponent(baseCurrency),
       encodeURIComponent(quoteCurrency),
     ].join('/');
-    const url = date ? `${path}?date=${encodeURIComponent(date)}` : path;
+    const query = createRateQuery({ date, source });
+    const url = query ? `${path}?${query}` : path;
 
     const payload = await this.fetchJson(url);
 
@@ -36,13 +37,18 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
       quoteCurrency: payload.quote,
       rate: payload.rate,
       date: payload.date,
+      source,
     };
   }
 
-  async getRates({ baseCurrency, quoteCurrencies, date = null }) {
-    const quotes = quoteCurrencies.map(encodeURIComponent).join(',');
-    const dateQuery = date ? `&date=${encodeURIComponent(date)}` : '';
-    const url = `${this.baseUrl}/rates?base=${encodeURIComponent(baseCurrency)}&quotes=${quotes}${dateQuery}`;
+  async getRates({ baseCurrency, quoteCurrencies, date = null, source = null }) {
+    const query = createRateQuery({
+      baseCurrency,
+      quoteCurrencies,
+      date,
+      source,
+    });
+    const url = `${this.baseUrl}/rates?${query}`;
     const payload = await this.fetchJson(url);
 
     if (!Array.isArray(payload) || payload.length !== quoteCurrencies.length) {
@@ -70,6 +76,7 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
     return {
       baseCurrency,
       rates: quoteCurrencies.map(quoteCurrency => ratesByQuoteCurrency.get(quoteCurrency)),
+      source,
     };
   }
 
@@ -91,6 +98,22 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
         }),
       ),
     );
+  }
+
+  async listSources() {
+    const payload = await this.fetchJson(`${this.baseUrl}/providers`);
+
+    if (!Array.isArray(payload) || !payload.every(isValidSource)) {
+      throw new ExchangeRateProviderError(
+        'Exchange rate provider returned an invalid source catalog',
+      );
+    }
+
+    return payload.map(source => ({
+      key: source.key,
+      name: source.name,
+      countryCode: source.country_code,
+    }));
   }
 
   async fetchJson(url) {
@@ -125,6 +148,28 @@ export class FrankfurterExchangeRateProvider extends ExchangeRateProvider {
   }
 }
 
+function createRateQuery({ baseCurrency, quoteCurrencies, date, source }) {
+  const query = new URLSearchParams();
+
+  if (baseCurrency) {
+    query.set('base', baseCurrency);
+  }
+
+  if (quoteCurrencies) {
+    query.set('quotes', quoteCurrencies.join(','));
+  }
+
+  if (date) {
+    query.set('date', date);
+  }
+
+  if (source) {
+    query.set('providers', source);
+  }
+
+  return query.toString();
+}
+
 function isValidRate(rate, baseCurrency, quoteCurrency) {
   return (
     rate !== null &&
@@ -147,6 +192,18 @@ function isValidCurrency(currency) {
     typeof currency.name === 'string' &&
     currency.name.trim() !== '' &&
     (currency.symbol === null || typeof currency.symbol === 'string')
+  );
+}
+
+function isValidSource(source) {
+  return (
+    source !== null &&
+    typeof source === 'object' &&
+    typeof source.key === 'string' &&
+    source.key.trim() !== '' &&
+    typeof source.name === 'string' &&
+    source.name.trim() !== '' &&
+    (source.country_code === null || typeof source.country_code === 'string')
   );
 }
 

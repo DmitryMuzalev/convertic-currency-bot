@@ -11,11 +11,13 @@ export class ExchangeRateProvider {
    * @param {string} request.baseCurrency ISO 4217 currency code, for example `EUR`.
    * @param {string} request.quoteCurrency ISO 4217 currency code, for example `USD`.
    * @param {string|null} [request.date] Date in `YYYY-MM-DD` format, or `null` for latest.
+   * @param {string|null} [request.source] Provider source key, or `null` for automatic selection.
    * @returns {Promise<{
    *   baseCurrency: string,
    *   quoteCurrency: string,
    *   rate: number,
-   *   date: string
+   *   date: string,
+   *   source: string|null
    * }>}
    */
   async getRate(request) {
@@ -30,9 +32,11 @@ export class ExchangeRateProvider {
    * @param {string} request.baseCurrency
    * @param {string[]} request.quoteCurrencies
    * @param {string|null} [request.date] Date in `YYYY-MM-DD` format, or `null` for latest.
+   * @param {string|null} [request.source] Provider source key, or `null` for automatic selection.
    * @returns {Promise<{
    *   baseCurrency: string,
-   *   rates: Array<{quoteCurrency: string, rate: number, date: string}>
+   *   rates: Array<{quoteCurrency: string, rate: number, date: string}>,
+   *   source: string|null
    * }>}
    */
   async getRates(request) {
@@ -51,5 +55,18 @@ export class ExchangeRateProvider {
    */
   async listCurrencies() {
     throw new Error('ExchangeRateProvider.listCurrencies() must be implemented');
+  }
+
+  /**
+   * Returns the rate sources known to the provider.
+   *
+   * @returns {Promise<Array<{
+   *   key: string,
+   *   name: string,
+   *   countryCode: string|null
+   * }>>}
+   */
+  async listSources() {
+    throw new Error('ExchangeRateProvider.listSources() must be implemented');
   }
 }

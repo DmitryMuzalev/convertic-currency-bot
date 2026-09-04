@@ -9,7 +9,7 @@ export class ConvertCurrency {
     this.getExchangeRate = getExchangeRate;
   }
 
-  async execute({ amount, baseCurrency, quoteCurrency } = {}) {
+  async execute({ amount, baseCurrency, quoteCurrency, source } = {}) {
     if (!Number.isFinite(amount) || amount <= 0) {
       throw new InvalidCurrencyAmountError(amount);
     }
@@ -17,6 +17,7 @@ export class ConvertCurrency {
     const exchangeRate = await this.getExchangeRate.execute({
       baseCurrency,
       quoteCurrency,
+      source,
     });
 
     return {

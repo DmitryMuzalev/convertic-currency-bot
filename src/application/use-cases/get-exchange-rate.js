@@ -1,5 +1,6 @@
 import { normalizeCurrencyCode } from '#domain/currency/normalize-currency-code.js';
 import { normalizeExchangeRateDate } from '#domain/exchange-rates/normalize-exchange-rate-date.js';
+import { normalizeExchangeRateSource } from '#domain/exchange-rates/normalize-exchange-rate-source.js';
 
 const DEFAULT_QUOTE_CURRENCY = 'USD';
 
@@ -12,10 +13,12 @@ export class GetExchangeRate {
     this.exchangeRateProvider = exchangeRateProvider;
   }
 
-  async execute({ baseCurrency, quoteCurrency = DEFAULT_QUOTE_CURRENCY, date } = {}) {
+  async execute({ baseCurrency, quoteCurrency = DEFAULT_QUOTE_CURRENCY, date, source } = {}) {
     const normalizedBaseCurrency = normalizeCurrencyCode(baseCurrency);
     const normalizedQuoteCurrency = normalizeCurrencyCode(quoteCurrency);
     const normalizedDate = date === undefined ? null : normalizeExchangeRateDate(date);
+    const normalizedSource =
+      source === null || source === undefined ? null : normalizeExchangeRateSource(source);
 
     if (normalizedBaseCurrency === normalizedQuoteCurrency) {
       return {
@@ -23,6 +26,7 @@ export class GetExchangeRate {
         quoteCurrency: normalizedQuoteCurrency,
         rate: 1,
         date: normalizedDate,
+        source: normalizedSource,
       };
     }
 
@@ -30,6 +34,7 @@ export class GetExchangeRate {
       baseCurrency: normalizedBaseCurrency,
       quoteCurrency: normalizedQuoteCurrency,
       date: normalizedDate,
+      source: normalizedSource,
     });
   }
 }
