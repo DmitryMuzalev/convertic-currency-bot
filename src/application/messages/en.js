@@ -36,7 +36,8 @@ export const ENGLISH_MESSAGES = Object.freeze({
     '',
     'More currency tricks are coming soon! ✨',
   ].join('\n'),
-  unknownCommand: '🎩 That spell is not in my book yet. Try /help to see what I can do.',
+  unknownCommand: '🎩 That spell is not in my book yet.',
+  errorNavigationHint: '📖 Need a hand? Open /help or check /currencies.',
   invalidCurrencyRequest: [
     '🪄 I could not understand that currency spell.',
     'Try EUR, EUR GBP, 100 EUR, EUR USD GBP JPY, or EUR USD 2025-01-15.',

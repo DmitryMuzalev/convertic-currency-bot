@@ -36,7 +36,8 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     '',
     'Скоро в книге появятся новые валютные фокусы! ✨',
   ].join('\n'),
-  unknownCommand: '🎩 Такого заклинания в моей книге пока нет. Загляни в /help.',
+  unknownCommand: '🎩 Такого заклинания в моей книге пока нет.',
+  errorNavigationHint: '📖 Нужна подсказка? Открой /help или проверь коды в /currencies.',
   invalidCurrencyRequest: [
     '🪄 Мне не удалось разобрать это валютное заклинание.',
     'Попробуй EUR, EUR GBP, 100 EUR, EUR USD GBP JPY или EUR USD 2025-01-15.',

@@ -1,5 +1,6 @@
 import { ExchangeRateProviderError } from '#application/errors/exchange-rate-provider-error.js';
 import { createCurrenciesMessage } from '#application/messages/format-currencies-message.js';
+import { createErrorMessage } from '#application/messages/format-error-message.js';
 import {
   createCurrentSourceMessage,
   createSelectedSourceMessage,
@@ -96,7 +97,10 @@ export class HandleTelegramMessage {
       return this.handleCompareCommand(chatId, command.argument, messages);
     }
 
-    await this.messageSender.sendMessage(chatId, messages.unknownCommand);
+    await this.messageSender.sendMessage(
+      chatId,
+      createErrorMessage(messages.unknownCommand, messages),
+    );
     return { handled: false, command: command.name };
   }
 
@@ -112,7 +116,10 @@ export class HandleTelegramMessage {
         throw error;
       }
 
-      await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+      await this.messageSender.sendMessage(
+        chatId,
+        createErrorMessage(messages.exchangeRateUnavailable, messages),
+      );
       return { handled: false, command: 'currencies' };
     }
   }
@@ -129,7 +136,10 @@ export class HandleTelegramMessage {
         throw error;
       }
 
-      await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+      await this.messageSender.sendMessage(
+        chatId,
+        createErrorMessage(messages.exchangeRateUnavailable, messages),
+      );
       return { handled: false, command: 'sources' };
     }
   }
@@ -155,12 +165,18 @@ export class HandleTelegramMessage {
       return { handled: true, command: 'source', source: selectedSource?.key ?? null };
     } catch (error) {
       if (error instanceof InvalidExchangeRateSourceError) {
-        await this.messageSender.sendMessage(chatId, messages.invalidSource);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidSource, messages),
+        );
         return { handled: false, command: 'source' };
       }
 
       if (error instanceof ExchangeRateProviderError) {
-        await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.exchangeRateUnavailable, messages),
+        );
         return { handled: false, command: 'source' };
       }
 
@@ -186,12 +202,18 @@ export class HandleTelegramMessage {
         error instanceof InvalidCurrencyCodeError ||
         error instanceof InvalidExchangeRateSourceError
       ) {
-        await this.messageSender.sendMessage(chatId, messages.invalidComparisonRequest);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidComparisonRequest, messages),
+        );
         return { handled: false, command: 'compare' };
       }
 
       if (error instanceof ExchangeRateProviderError) {
-        await this.messageSender.sendMessage(chatId, messages.exchangeRateUnavailable);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.exchangeRateUnavailable, messages),
+        );
         return { handled: false, command: 'compare' };
       }
 

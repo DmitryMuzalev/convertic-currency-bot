@@ -6,6 +6,7 @@ import {
   createMultipleRatesMessage,
   createRateMessage,
 } from '#application/messages/format-currency-message.js';
+import { createErrorMessage } from '#application/messages/format-error-message.js';
 import { getMessages } from '#application/messages/get-messages.js';
 import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-error.js';
 import { InvalidCurrencyAmountError } from '#domain/errors/invalid-currency-amount-error.js';
@@ -64,7 +65,10 @@ export class HandleCurrencyMessage {
       const request = await this.recognizeCurrencyRequest.execute(text);
 
       if (!request) {
-        await this.messageSender.sendMessage(chatId, messages.invalidCurrencyRequest);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidCurrencyRequest, messages),
+        );
         return { handled: false };
       }
 
@@ -78,7 +82,10 @@ export class HandleCurrencyMessage {
       return { handled: true, request: requestWithSource, result };
     } catch (error) {
       if (error instanceof InvalidExchangeRateDateError) {
-        await this.messageSender.sendMessage(chatId, messages.invalidExchangeRateDate);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidExchangeRateDate, messages),
+        );
         return { handled: false };
       }
 
@@ -87,7 +94,10 @@ export class HandleCurrencyMessage {
         error instanceof InvalidCurrencyAmountError ||
         error instanceof InvalidCurrencyListError
       ) {
-        await this.messageSender.sendMessage(chatId, messages.invalidCurrencyRequest);
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidCurrencyRequest, messages),
+        );
         return { handled: false };
       }
 
@@ -99,7 +109,7 @@ export class HandleCurrencyMessage {
               ? messages.currencyPairNotFound
               : messages.exchangeRateUnavailable;
 
-        await this.messageSender.sendMessage(chatId, message);
+        await this.messageSender.sendMessage(chatId, createErrorMessage(message, messages));
         return { handled: false };
       }
 
