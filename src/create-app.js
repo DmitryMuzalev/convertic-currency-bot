@@ -13,7 +13,7 @@ import { RecognizeCurrencyRequest } from '#application/use-cases/recognize-curre
 import { SelectExchangeRateSource } from '#application/use-cases/select-exchange-rate-source.js';
 import { buildApp } from '#infrastructure/http/build-app.js';
 
-export function createApp({ telegramBotToken, logger = false } = {}) {
+export function createApp({ httpServer, telegramBotToken, logger = false } = {}) {
   const exchangeRateProvider = new FrankfurterExchangeRateProvider();
   const getExchangeRate = new GetExchangeRate(exchangeRateProvider);
   const getMultipleExchangeRates = new GetMultipleExchangeRates(exchangeRateProvider);
@@ -51,6 +51,7 @@ export function createApp({ telegramBotToken, logger = false } = {}) {
 
   return buildApp({
     handleTelegramMessage,
+    httpServer,
     logger,
   });
 }
