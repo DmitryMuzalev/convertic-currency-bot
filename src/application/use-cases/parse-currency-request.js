@@ -1,8 +1,9 @@
 import { MAX_QUOTE_CURRENCIES } from '#application/rules/currency-request-limits.js';
+import { InvalidCurrencyAmountError } from '#domain/errors/invalid-currency-amount-error.js';
 
 const DEFAULT_QUOTE_CURRENCY = 'USD';
 const CURRENCY_CODE = '[A-Za-z]{3}';
-const AMOUNT = '[0-9]+(?:[.,][0-9]+)?';
+const AMOUNT = '-?[0-9]+(?:[.,][0-9]+)?';
 const DATE = '[0-9]{4}-[0-9]{2}-[0-9]{2}';
 const END_PUNCTUATION = '[.!?]?';
 
@@ -31,7 +32,7 @@ export function parseCurrencyRequest(text) {
     const amount = Number(conversionMatch[1].replace(',', '.'));
 
     if (!Number.isFinite(amount) || amount <= 0) {
-      return null;
+      throw new InvalidCurrencyAmountError(amount);
     }
 
     return {

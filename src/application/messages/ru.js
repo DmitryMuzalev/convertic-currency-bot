@@ -62,6 +62,7 @@ export const RUSSIAN_MESSAGES = Object.freeze({
     'Попробуй EUR, EUR GBP, 100 EUR, EUR USD GBP JPY или EUR USD 2025-01-15.',
     'Также можно написать: переведи 100 EUR в GBP.',
   ].join('\n'),
+  invalidCurrencyAmount: '🪄 Сумма должна быть больше нуля. Например: 8 EUR.',
   currencyPairNotFound:
     '🔮 Мне не удалось найти эту валютную пару. Проверь трёхбуквенные коды валют и попробуй снова.',
   exchangeRateUnavailable:

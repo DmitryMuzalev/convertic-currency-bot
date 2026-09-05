@@ -62,6 +62,7 @@ export const ENGLISH_MESSAGES = Object.freeze({
     'Try EUR, EUR GBP, 100 EUR, EUR USD GBP JPY, or EUR USD 2025-01-15.',
     'You can also write: convert 100 EUR to GBP.',
   ].join('\n'),
+  invalidCurrencyAmount: '🪄 The amount must be greater than zero. For example: 8 EUR.',
   currencyPairNotFound:
     '🔮 I could not find that currency pair. Check the three-letter currency codes and try again.',
   exchangeRateUnavailable:

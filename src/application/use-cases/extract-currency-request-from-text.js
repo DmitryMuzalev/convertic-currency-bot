@@ -3,8 +3,8 @@ import { MAX_QUOTE_CURRENCIES } from '#application/rules/currency-request-limits
 import { parseCurrencyRequest } from './parse-currency-request.js';
 
 const TOKEN_PATTERN =
-  /(?<![A-Za-z0-9_])(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[A-Za-z]+|[0-9]+(?:[.,][0-9]+)?)(?![A-Za-z0-9_])/g;
-const AMOUNT_PATTERN = /^[0-9]+(?:[.,][0-9]+)?$/;
+  /(?<![A-Za-z0-9_+-])(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[A-Za-z]+|-?[0-9]+(?:[.,][0-9]+)?)(?![A-Za-z0-9_])/g;
+const AMOUNT_PATTERN = /^-?[0-9]+(?:[.,][0-9]+)?$/;
 const DATE_PATTERN = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 
 export function extractCurrencyRequestFromText(text, currencies) {

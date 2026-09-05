@@ -115,11 +115,15 @@ export class HandleCurrencyMessage {
         return { handled: false };
       }
 
-      if (
-        error instanceof InvalidCurrencyCodeError ||
-        error instanceof InvalidCurrencyAmountError ||
-        error instanceof InvalidCurrencyListError
-      ) {
+      if (error instanceof InvalidCurrencyAmountError) {
+        await this.messageSender.sendMessage(
+          chatId,
+          createErrorMessage(messages.invalidCurrencyAmount, messages),
+        );
+        return { handled: false };
+      }
+
+      if (error instanceof InvalidCurrencyCodeError || error instanceof InvalidCurrencyListError) {
         await this.messageSender.sendMessage(
           chatId,
           createErrorMessage(messages.invalidCurrencyRequest, messages),
