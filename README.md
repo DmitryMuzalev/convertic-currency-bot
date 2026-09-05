@@ -1,6 +1,6 @@
 # Convertic Currency Bot
 
-Convertic is a Telegram bot for viewing currency exchange rates, converting amounts, retrieving historical rates, and comparing data from different central banks.
+Convertic is a Telegram bot for viewing currency exchange rates, converting amounts, retrieving historical rates, and comparing data from different rate providers.
 
 The bot uses the [Frankfurter API](https://frankfurter.dev/) as its exchange-rate provider.
 
@@ -15,7 +15,6 @@ The bot uses the [Frankfurter API](https://frankfurter.dev/) as its exchange-rat
 - View catalogs of supported currencies and exchange-rate sources.
 - Select a preferred central-bank source.
 - Compare a currency pair using data from two to five sources.
-- Respond in English or Russian based on the Telegram user's language.
 
 ## Supported requests
 
@@ -26,11 +25,12 @@ The bot uses the [Frankfurter API](https://frankfurter.dev/) as its exchange-rat
 | Convert to USD | `100 EUR` | Value of 100 EUR in USD |
 | Convert a currency pair | `100 EUR GBP` | Value of 100 EUR in GBP |
 | Multiple rates | `EUR USD GBP JPY` | EUR rates against USD, GBP, and JPY |
+| Historical rate against USD | `EUR 2025-01-15` | EUR-to-USD rate for the specified date |
 | Historical rate | `EUR USD 2025-01-15` | EUR-to-USD rate for the specified date |
 | Multiple historical rates | `EUR USD GBP JPY 2025-01-15` | Historical EUR rates against multiple currencies |
 | Natural-language request | `convert 100 EUR to GBP` | Recognized currency conversion request |
 
-Currency codes are case-insensitive and must consist of three letters. A multiple-rate request can contain one base currency and from two to eight distinct quote currencies. Historical dates use the `YYYY-MM-DD` format and cannot be in the future.
+Currency codes are case-insensitive and must be supported by Frankfurter; use `/currencies` to view the current catalog. Amounts must be positive and may use a period or comma as the decimal separator. A multiple-rate request contains one base currency and from two to eight distinct quote currencies. Historical dates use the `YYYY-MM-DD` format and cannot be in the future.
 
 ## Telegram commands
 
@@ -44,6 +44,8 @@ Currency codes are case-insensitive and must consist of three letters. A multipl
 | `/source ECB`              | Use the selected source for subsequent requests             |
 | `/source AUTO`             | Return to the consolidated Frankfurter rate                 |
 | `/compare EUR USD ECB BOE` | Compare a currency pair using data from two to five sources |
+
+Source keys are case-insensitive. The selected source is applied to subsequent rate, conversion, and historical requests. User preferences are stored in memory and reset whenever the application restarts.
 
 ## Technology stack
 
@@ -61,10 +63,10 @@ Currency codes are case-insensitive and must consist of three letters. A multipl
 
 ## Installation
 
-Install the dependencies:
+Install the dependencies from `package-lock.json`:
 
 ```bash
-npm install
+npm ci
 ```
 
 Create a local `.env` file from the example:
@@ -124,6 +126,18 @@ npm run telegram:delete-webhook
 ```
 
 Stop the application and tunnel by pressing `Ctrl+C` in their respective terminals.
+
+## Project structure
+
+The codebase follows clean architecture, with dependencies directed toward the domain:
+
+- `src/domain` contains currency and exchange-rate validation rules.
+- `src/application` contains use cases, ports, response formatting, and request parsing.
+- `src/adapters` integrates Frankfurter, Telegram, and preference storage.
+- `src/infrastructure` contains configuration and HTTP setup.
+- `src/create-app.js` composes the application dependencies.
+- `scripts` contains the Telegram webhook management utility.
+- `docs` contains the C4 architecture diagrams.
 
 ## Available scripts
 
