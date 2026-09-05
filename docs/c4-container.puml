@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Container>
+
+title Container diagram for Convertic Currency Bot
+
+LAYOUT_LEFT_RIGHT()
+
+Person(user, "Telegram user", "Requests exchange rates and currency conversions")
+
+System_Ext(telegram, "Telegram Bot API", "Delivers webhook updates and displays bot replies")
+System_Ext(frankfurter, "Frankfurter API", "Provides currencies, exchange rates, and source catalogs")
+
+System_Boundary(convertic, "Convertic Currency Bot") {
+  Container(backend, "Fastify application", "Node.js 24, Fastify 5", "Receives Telegram webhooks, executes application use cases, formats replies, and keeps user source preferences in process memory")
+}
+
+Rel(user, telegram, "Sends commands and receives replies", "Telegram")
+Rel(telegram, backend, "POST /webhooks/telegram", "HTTPS/JSON")
+Rel(backend, telegram, "Calls sendMessage", "HTTPS/JSON")
+Rel(backend, frankfurter, "Requests rates, currencies, and providers", "HTTPS/JSON")
+
+SHOW_LEGEND()
+@enduml

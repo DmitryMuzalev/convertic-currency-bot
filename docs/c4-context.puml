@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Context>
+
+title System Context diagram for Convertic Currency Bot
+
+LAYOUT_LEFT_RIGHT()
+
+Person(user, "Telegram user", "Requests exchange rates and currency conversions")
+
+System(convertic, "Convertic Currency Bot", "Returns current and historical exchange rates, converts amounts, and compares rate sources")
+
+System_Ext(telegram, "Telegram Bot API", "Delivers user messages to the bot and displays its replies")
+System_Ext(frankfurter, "Frankfurter API", "Provides currencies, exchange rates, and central-bank source catalogs")
+
+Rel(user, telegram, "Sends commands and receives replies", "Telegram")
+Rel(telegram, convertic, "Delivers webhook updates", "HTTPS/JSON")
+Rel(convertic, telegram, "Sends localized replies", "HTTPS/JSON")
+Rel(convertic, frankfurter, "Requests exchange-rate data", "HTTPS/JSON")
+
+SHOW_LEGEND()
+@enduml

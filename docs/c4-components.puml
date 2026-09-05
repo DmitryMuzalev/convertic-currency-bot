@@ -1,0 +1,52 @@
+@startuml
+!include <C4/C4_Component>
+
+title Component diagram for the Fastify application
+
+System_Ext(telegram, "Telegram Bot API", "Delivers webhook updates and accepts bot replies")
+System_Ext(frankfurter, "Frankfurter API", "Provides exchange-rate data")
+
+Container_Boundary(backend, "Fastify application") {
+  Component(webhook, "Telegram webhook route", "Fastify HTTP adapter", "Validates the update shape and passes text messages to the application")
+  Component(telegramHandler, "HandleTelegramMessage", "Application use case", "Routes bot commands and delegates currency messages")
+  Component(currencyHandler, "HandleCurrencyMessage", "Application use case", "Coordinates request recognition, exchange-rate operations, and reply formatting")
+  Component(currencyUseCases, "Currency use cases", "Application services", "Recognize, get, convert, list, select, and compare currency data")
+  Component(domain, "Domain rules", "Domain layer", "Validates currency codes, dates, amounts, lists, and source keys")
+  Component(messages, "Message formatters", "Application layer", "Builds English and Russian Telegram responses")
+  Component(exchangeRatePort, "ExchangeRateProvider", "Application port", "Defines exchange-rate operations required by use cases")
+  Component(messageSenderPort, "MessageSender", "Application port", "Defines outgoing message delivery")
+  Component(preferencesPort, "UserPreferencesRepository", "Application port", "Defines access to the selected source")
+  Component(frankfurterAdapter, "FrankfurterExchangeRateProvider", "Outbound adapter", "Implements ExchangeRateProvider using the Frankfurter API")
+  Component(telegramAdapter, "TelegramBotApi", "Outbound adapter", "Implements MessageSender using the Telegram Bot API")
+  Component(preferencesAdapter, "InMemoryUserPreferencesRepository", "Storage adapter", "Keeps source preferences in process memory")
+  Component(composition, "createApp", "Composition root", "Creates components and injects concrete adapters into use cases")
+}
+
+Rel(telegram, webhook, "Delivers updates", "HTTPS/JSON")
+Rel(webhook, telegramHandler, "Executes")
+Rel(telegramHandler, currencyHandler, "Delegates non-command messages")
+Rel(telegramHandler, currencyUseCases, "Executes command use cases")
+Rel(telegramHandler, messages, "Formats command replies")
+Rel(currencyHandler, currencyUseCases, "Executes currency use cases")
+Rel(currencyHandler, messages, "Formats currency replies")
+Rel(currencyUseCases, domain, "Uses")
+Rel(currencyUseCases, exchangeRatePort, "Uses")
+Rel(telegramHandler, preferencesPort, "Reads and updates source preferences")
+Rel(currencyHandler, preferencesPort, "Reads source preferences")
+Rel(telegramHandler, messageSenderPort, "Sends replies through")
+Rel(currencyHandler, messageSenderPort, "Sends replies through")
+Rel(frankfurterAdapter, exchangeRatePort, "Implements")
+Rel(telegramAdapter, messageSenderPort, "Implements")
+Rel(preferencesAdapter, preferencesPort, "Implements")
+Rel(frankfurterAdapter, frankfurter, "Requests exchange-rate data", "HTTPS/JSON")
+Rel(telegramAdapter, telegram, "Calls sendMessage", "HTTPS/JSON")
+Rel(composition, webhook, "Creates")
+Rel(composition, telegramHandler, "Creates and connects")
+Rel(composition, currencyHandler, "Creates and connects")
+Rel(composition, currencyUseCases, "Creates and connects")
+Rel(composition, frankfurterAdapter, "Creates and injects")
+Rel(composition, telegramAdapter, "Creates and injects")
+Rel(composition, preferencesAdapter, "Creates and injects")
+
+SHOW_LEGEND()
+@enduml
