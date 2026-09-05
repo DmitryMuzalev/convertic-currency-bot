@@ -2,6 +2,8 @@
 
 Convertic is a Telegram bot for viewing currency exchange rates, converting amounts, retrieving historical rates, and comparing data from different rate providers.
 
+[Open Convertic in Telegram](https://t.me/convertic_currency_bot)
+
 The bot uses the [Frankfurter API](https://frankfurter.dev/) as its exchange-rate provider.
 
 ## Features
