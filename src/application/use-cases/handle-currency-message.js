@@ -1,10 +1,12 @@
 import { ExchangeRateProviderError } from '#application/errors/exchange-rate-provider-error.js';
 import {
   createConversionMessage,
+  createDuplicateCurrencyMessage,
   createHistoricalMultipleRatesMessage,
   createHistoricalRateMessage,
   createMultipleRatesMessage,
   createRateMessage,
+  createSameCurrencyMessage,
 } from '#application/messages/format-currency-message.js';
 import { createErrorMessage } from '#application/messages/format-error-message.js';
 import { getMessages } from '#application/messages/get-messages.js';
@@ -12,6 +14,7 @@ import { InvalidCurrencyCodeError } from '#domain/errors/invalid-currency-code-e
 import { InvalidCurrencyAmountError } from '#domain/errors/invalid-currency-amount-error.js';
 import { InvalidCurrencyListError } from '#domain/errors/invalid-currency-list-error.js';
 import { InvalidExchangeRateDateError } from '#domain/errors/invalid-exchange-rate-date-error.js';
+import { normalizeExchangeRateDate } from '#domain/exchange-rates/normalize-exchange-rate-date.js';
 
 export class HandleCurrencyMessage {
   constructor({
@@ -70,6 +73,29 @@ export class HandleCurrencyMessage {
           createErrorMessage(messages.invalidCurrencyRequest, messages),
         );
         return { handled: false };
+      }
+
+      const duplicateCurrency = findDuplicateCurrency(request);
+
+      if (duplicateCurrency) {
+        if (request.date !== undefined) {
+          normalizeExchangeRateDate(request.date);
+        }
+
+        await this.messageSender.sendMessage(
+          chatId,
+          createDuplicateCurrencyMessage(duplicateCurrency, messages),
+        );
+        return { handled: false, request };
+      }
+
+      if (request.baseCurrency === request.quoteCurrency) {
+        if (request.date !== undefined) {
+          normalizeExchangeRateDate(request.date);
+        }
+
+        await this.messageSender.sendMessage(chatId, createSameCurrencyMessage(request, messages));
+        return { handled: true, request };
       }
 
       selectedSource = await this.userPreferencesRepository.getExchangeRateSource(userId);
@@ -148,4 +174,22 @@ export class HandleCurrencyMessage {
 
     return createRateMessage(result, messages);
   }
+}
+
+function findDuplicateCurrency({ baseCurrency, quoteCurrencies }) {
+  if (!Array.isArray(quoteCurrencies)) {
+    return null;
+  }
+
+  const seenCurrencies = new Set([baseCurrency]);
+
+  for (const currency of quoteCurrencies) {
+    if (seenCurrencies.has(currency)) {
+      return currency;
+    }
+
+    seenCurrencies.add(currency);
+  }
+
+  return null;
 }

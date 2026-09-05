@@ -1,5 +1,38 @@
 import { formatCurrencyValue } from './format-currency-value.js';
 
+export function createSameCurrencyMessage({ type, amount, baseCurrency, date }, messages) {
+  const value = formatCurrencyValue(
+    type === 'conversion' ? amount : 1,
+    baseCurrency,
+    messages.locale,
+  );
+
+  if (type === 'historical-rate') {
+    return [
+      fillCurrencyPlaceholder(messages.historicalSameCurrencyMessage, baseCurrency),
+      '',
+      `${value} = ${value}`,
+      `${messages.rateDateLabel}: ${date}`,
+    ].join('\n');
+  }
+
+  return [
+    messages.sameCurrencyHeading,
+    '',
+    `${value} = ${value}`,
+    '',
+    messages.sameCurrencyPunchline,
+  ].join('\n');
+}
+
+export function createDuplicateCurrencyMessage(currency, messages) {
+  return [
+    fillCurrencyPlaceholder(messages.duplicateCurrencyMessage, currency),
+    '',
+    messages.duplicateCurrencyHint,
+  ].join('\n');
+}
+
 export function createRateMessage({ baseCurrency, quoteCurrency, rate, date, source }, messages) {
   return createRateMessageWithHeading(
     { baseCurrency, quoteCurrency, rate, date, source },
@@ -119,4 +152,8 @@ function createMultipleRatesMessageWithHeading({ baseCurrency, rates, source }, 
 
 function formatSource(source, messages) {
   return source ?? messages.automaticSourceName;
+}
+
+function fillCurrencyPlaceholder(message, currency) {
+  return message.replaceAll('{currency}', currency);
 }
